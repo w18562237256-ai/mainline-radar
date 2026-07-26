@@ -40,7 +40,7 @@ async function mapLimit(items, limit, mapper) {
 }
 
 async function getBoardGroup(type, boardType) {
-  const fields = "f12,f14,f3,f24,f62,f104,f105,f109,f184";
+  const fields = "f12,f14,f3,f24,f62,f104,f105,f109,f128,f184";
   const hosts = ["7.push2.eastmoney.com", "82.push2.eastmoney.com", "56.push2.eastmoney.com", "push2.eastmoney.com"];
   const rows = [];
   for (let page = 1; page <= 8; page += 1) {
@@ -77,7 +77,7 @@ async function getHistory(code) {
 }
 
 async function getLeaders(code) {
-  const query = `pn=1&pz=60&po=1&np=1&fltt=2&invt=2&fid=f6&fs=b%3A${code}&fields=f14%2Cf3%2Cf6%2Cf109`;
+  const query = `pn=1&pz=60&po=1&np=1&fltt=2&invt=2&fid=f6&fs=b%3A${code}%2Bf%3A!50&fields=f14%2Cf3%2Cf6%2Cf109`;
   const json = await fetchFirst([
     `https://7.push2.eastmoney.com/api/qt/clist/get?${query}`,
     `https://82.push2.eastmoney.com/api/qt/clist/get?${query}`,
@@ -172,7 +172,20 @@ const finalistsMap = new Map();
 [...topBy("day"), ...topBy("current"), ...topBy("mid")].forEach((theme) => finalistsMap.set(theme.id, theme));
 const finalists = [...finalistsMap.values()];
 
-const leaderResults = await mapLimit(finalists, 5, async (theme) => ({ id: theme.id, leaders: await getLeaders(theme.id) }));
+const boardById = new Map(allBoards.map((board) => [board.f12, board]));
+const leaderResults = await mapLimit(finalists, 5, async (theme) => {
+  try {
+    return { id: theme.id, leaders: await getLeaders(theme.id) };
+  } catch {
+    const fallbackName = boardById.get(theme.id)?.f128;
+    return {
+      id: theme.id,
+      leaders: fallbackName && fallbackName !== "-"
+        ? [{ rank: "龙一", name: fallbackName }]
+        : [],
+    };
+  }
+});
 const leadersById = new Map(leaderResults.flatMap((result) => result.status === "fulfilled" ? [[result.value.id, result.value.leaders]] : []));
 const themes = finalists.map((theme) => ({ ...theme, leaders: leadersById.get(theme.id) ?? [] }));
 const pick = (period) => [...themes].sort((a, b) => b.scores[period] - a.scores[period])[0];
