@@ -7,6 +7,7 @@ type Theme = {
   id: string;
   name: string;
   matchedBoard: string;
+  boardType?: string;
   scores: { day: number; current: number; mid: number };
   returns: { day: number; fiveDay: number; twentyDay: number };
   breadth: number;
@@ -24,6 +25,7 @@ type Payload = {
   leaders: null | { day: PeriodLeader; current: PeriodLeader; mid: PeriodLeader };
   themes: Theme[];
   method: string;
+  coverage?: { totalBoards: number; deepAnalyzed: number; displayed: number };
 };
 
 const number = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
@@ -81,6 +83,8 @@ export default function Home() {
   );
 
   const findTheme = (id?: string) => data?.themes.find((theme) => theme.id === id);
+  const findStockTheme = (stock: string) =>
+    data?.themes.find((theme) => theme.leaders.some((leader) => leader.name === stock));
 
   return (
     <main>
@@ -145,6 +149,7 @@ export default function Home() {
             ? `近20日最强是${data.leaders.mid.name}，近5日最强是${data.leaders.current.name}，最近交易日最强是${data.leaders.day.name}。`
             : "没有有效行情时不做主线排名，也不显示人工预设答案。"}
         </p>
+        {data?.coverage && <span className="coverage">已扫描 {data.coverage.totalBoards} 个板块</span>}
       </section>
 
       <section className="board-section" id="list">
@@ -166,7 +171,7 @@ export default function Home() {
               {themes.map((theme) => (
                 <details className="board-row" key={theme.id}>
                   <summary className="dynamic-row">
-                    <span className="board-name"><b>{theme.name}</b><small>对应行情：{theme.matchedBoard}</small></span>
+                    <span className="board-name"><b>{theme.name}</b><small>{theme.boardType ?? "板块"} · {theme.matchedBoard}</small></span>
                     <span className="state wait"><i />{themeRole(theme, data.leaders)}</span>
                     <span className="dragons">
                       <b><em>龙一</em>{theme.leaders[0]?.name ?? "待确认"}</b>
@@ -211,7 +216,7 @@ export default function Home() {
             ["military", "长城军工", "军工"],
             ["vc-additive", "孚日股份", "VC添加剂"],
           ].map(([id, stock, sector]) => {
-            const theme = findTheme(id);
+            const theme = findStockTheme(stock);
             const rank = theme?.leaders.findIndex((leader) => leader.name === stock) ?? -1;
             return (
               <article key={id}>

@@ -248,6 +248,20 @@ export async function GET() {
       method: "今日看当日涨幅、上涨家数和资金强度；近5日看累计表现与上涨天数；中期看近20日趋势。三个周期分别排名。",
     }, { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=180" } });
   } catch {
+    try {
+      const snapshot = await fetch(
+        "https://raw.githubusercontent.com/w18562237256-ai/mainline-radar/main/public/market-data.json",
+        { signal: AbortSignal.timeout(5000), cache: "no-store" },
+      );
+      if (snapshot.ok) {
+        const payload = await snapshot.json() as Record<string, unknown>;
+        return NextResponse.json(payload, {
+          headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+        });
+      }
+    } catch {
+      // Continue to the explicit unavailable response below.
+    }
     return NextResponse.json({
       available: false,
       sourceLabel: "行情数据暂时未连接",
