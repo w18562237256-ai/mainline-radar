@@ -131,8 +131,43 @@ function strength(score) {
   return score >= 70 ? "较强" : score >= 58 ? "观察" : "偏弱";
 }
 
+const NON_THEME_BOARD = /昨日|首板|连板|涨停|打板|新高|新低|触板|炸板|破净|融资融券|沪股通|深股通|标普|MSCI|富时罗素|机构重仓|基金重仓|社保重仓|QFII/;
+
+function themeGroup(rawName) {
+  const name = rawName.replace(/[ⅡⅢ]+$/, "");
+  if (/地面兵装|航空装备|航天装备|军工电子/.test(name)) return "军工装备";
+  if (/黄金|白银|贵金属/.test(name)) return "贵金属";
+  if (/油田服务|油服工程|油气及炼化工程/.test(name)) return "油气服务";
+  if (/半导体设备|集成电路封测|中芯概念|高带宽内存/.test(name)) return "半导体产业链";
+  return name;
+}
+
+function calculateScores({ day, fiveDay, twentyDay, breadth, netIn }) {
+  let dayScore = scale(day, -2, 7) * .4 + breadth * 25
+    + scale(netIn, -10, 30) * .2 + scale(fiveDay, -5, 15) * .15;
+  let currentScore = scale(fiveDay, -5, 18) * .4 + scale(day, -3, 5) * .15
+    + breadth * 20 + scale(netIn, -15, 30) * .15 + scale(twentyDay, -10, 30) * .1;
+  let midScore = scale(twentyDay, -10, 35) * .4 + scale(fiveDay, -5, 18) * .25
+    + breadth * 15 + scale(netIn, -15, 30) * .1 + scale(day, -3, 5) * .1;
+  if (day < -2 || breadth < .25) {
+    dayScore -= 12;
+    currentScore -= 10;
+    midScore -= 5;
+  }
+  if (netIn < 0) {
+    currentScore -= 5;
+    midScore -= 3;
+  }
+  return {
+    day: Math.round(clamp(dayScore)),
+    current: Math.round(clamp(currentScore)),
+    mid: Math.round(clamp(midScore)),
+  };
+}
+
 function selectCandidates(boards) {
-  const ranked = (selector, count = 18) => [...boards]
+  const eligibleBoards = boards.filter((board) => !NON_THEME_BOARD.test(board.f14));
+  const ranked = (selector, count = 18) => [...eligibleBoards]
     .filter((board) => Number.isFinite(selector(board)))
     .sort((a, b) => selector(b) - selector(a))
     .slice(0, count);
@@ -178,23 +213,27 @@ const historyResults = await mapLimit(candidates, 6, async (quote) => {
   const day = Number(quote.f3 ?? 0);
   const fiveDay = periodReturn(history, 5);
   const twentyDay = periodReturn(history, 20);
-  const positive5 = history.slice(-5).filter((row) => row.pct > 0).length;
-  const positive20 = history.slice(-20).filter((row) => row.pct > 0).length;
-  const dayScore = Math.round(scale(day, -2, 7) * .45 + breadth * 30 + scale(Number(quote.f184 ?? 0), -8, 12) * .25);
-  const currentScore = Math.round(scale(fiveDay, -5, 18) * .48 + (positive5 / 5) * 22 + dayScore * .3);
-  const midScore = Math.round(scale(twentyDay, -10, 35) * .55 + (positive20 / 20) * 20 + currentScore * .25);
+  const netIn = Number(quote.f62 ?? 0) / 100_000_000;
   return {
     id: String(quote.f12), name: quote.f14, matchedBoard: quote.f14, boardType: quote.boardType,
-    scores: { day: dayScore, current: currentScore, mid: midScore },
+    scores: calculateScores({ day, fiveDay, twentyDay, breadth, netIn }),
     returns: { day, fiveDay, twentyDay }, breadth,
-    netIn: Number(quote.f62 ?? 0) / 100_000_000,
+    netIn,
     leaders: [], ...genericInsight(quote), sessionDate: history.at(-1).date,
   };
 });
 
 const analyzed = historyResults.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
 if (!analyzed.length) throw new Error("No candidate history resolved");
-const topBy = (period, count = 15) => [...analyzed].sort((a, b) => b.scores[period] - a.scores[period]).slice(0, count);
+const deduped = [...analyzed.reduce((groups, theme) => {
+  const group = themeGroup(theme.name);
+  const previous = groups.get(group);
+  const total = Object.values(theme.scores).reduce((sum, value) => sum + value, 0);
+  const previousTotal = previous ? Object.values(previous.scores).reduce((sum, value) => sum + value, 0) : -1;
+  if (total > previousTotal) groups.set(group, { ...theme, name: group });
+  return groups;
+}, new Map()).values()];
+const topBy = (period, count = 15) => [...deduped].sort((a, b) => b.scores[period] - a.scores[period]).slice(0, count);
 const finalistsMap = new Map();
 [...topBy("day"), ...topBy("current"), ...topBy("mid")].forEach((theme) => finalistsMap.set(theme.id, theme));
 const finalists = [...finalistsMap.values()];
