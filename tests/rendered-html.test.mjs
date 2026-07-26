@@ -11,7 +11,7 @@ async function builtServerSource() {
 
 test("server-renders the market mainline dashboard shell", async () => {
   const source = await builtServerSource();
-  assert.match(source, /主线雷达｜A股市场主线监测/);
+  assert.match(source, /主线雷达｜A股前向信号监测/);
   assert.match(source, /今天先看这个/);
   assert.match(source, /主线温度/);
   assert.match(source, /前向实时监测/);
