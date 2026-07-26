@@ -278,8 +278,11 @@ export default function Home() {
     () => [...(data?.themes ?? [])].sort((a, b) => b.score - a.score),
     [data],
   );
-  const strongest = ranked.find((theme) => theme.id === data?.market.strongestThemeId) ?? ranked[0];
-  const nextTheme = ranked.find((theme) => theme.id === data?.market.nextThemeId) ?? ranked[1];
+  const strongest = data?.market.strongestThemeId
+    ? ranked.find((theme) => theme.id === data.market.strongestThemeId)
+    : undefined;
+  const nextTheme = ranked.find((theme) => theme.id === data?.market.nextThemeId)
+    ?? ranked.find((theme) => theme.phase !== "退潮");
   const filtered = ranked.filter((theme) =>
     (phaseFilter === "全部" || theme.phase === phaseFilter)
     && (!query || `${theme.name}${theme.matchedBoard}${theme.leaders.map((leader) => leader.name).join("")}`.includes(query))
@@ -341,7 +344,7 @@ export default function Home() {
               <span>今天先看这个</span>
               {strongest && <i className={`phase-badge ${phaseClass[strongest.phase]}`}>{strongest.phase}</i>}
             </div>
-            <h1>{strongest?.name ?? "等待有效行情"}</h1>
+            <h1>{strongest?.name ?? "暂无确认主线"}</h1>
             <p className="plain-conclusion">{data?.market.conclusion ?? "数据不足，暂不判断"}</p>
 
             <div className="leader-line">

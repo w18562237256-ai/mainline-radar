@@ -41,6 +41,10 @@ test("V4 model scans live boards and keeps attribution separate from membership"
   assert.match(script, /当天催化交叉核验/);
   assert.doesNotMatch(script, /dayScore|currentScore|midScore/);
   assert.match(liveModel, /REQUIRED_COVERAGE_BOARDS = \["BK0457"\]/);
+  assert.match(liveModel, /detail_only_excluded_from_ranking/);
+  assert.doesNotMatch(liveModel, /if \(!byId\.has\(id\)\) byId\.set/);
+  assert.match(liveModel, /positiveDays5 >= 3/);
+  assert.match(liveModel, /strongestThemeId: confirmedThemes\[0\]\?\.id \?\? null/);
   assert.match(liveModel, /constituentVerified: true/);
   assert.match(liveModel, /themeRelationVerified: false/);
   assert.match(liveModel, /historyValid/);

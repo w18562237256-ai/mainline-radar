@@ -183,6 +183,8 @@ function phaseFor(input: {
   continuity: number;
   leaderCount: number;
   historyValid: boolean;
+  fiveDay: number;
+  positiveDays5: number;
 }) {
   if (input.change <= -1.2 || input.breadth < 0.25) return "退潮";
   if (
@@ -191,7 +193,14 @@ function phaseFor(input: {
     && input.continuity >= 50
     && input.leaderCount >= 2
   ) return "加速";
-  if (input.score >= 62 && input.breadth >= 0.5 && input.leaderCount >= 2) return "启动";
+  if (
+    input.historyValid
+    && input.fiveDay > 0
+    && input.positiveDays5 >= 3
+    && input.score >= 62
+    && input.breadth >= 0.5
+    && input.leaderCount >= 2
+  ) return "启动";
   return "观察";
 }
 
@@ -201,17 +210,24 @@ export async function getLiveMarket() {
   if (overview.length < 100) throw new Error("sector overview incomplete");
 
   const byId = new Map(overview.map((board) => [board.id, board]));
-  for (const id of REQUIRED_COVERAGE_BOARDS) {
-    if (!byId.has(id)) byId.set(id, { id, name: id === "BK0457" ? "电网设备" : id, change: 0, netIn: 0 });
-  }
   const allBoards = [...byId.values()];
   const rankedSeeds = [...allBoards]
     .sort((a, b) => (b.change * 3 + Math.max(b.netIn, 0)) - (a.change * 3 + Math.max(a.netIn, 0)))
     .slice(0, 10);
-  for (const id of REQUIRED_COVERAGE_BOARDS) {
-    const required = byId.get(id);
-    if (required && !rankedSeeds.some((board) => board.id === id)) rankedSeeds.push(required);
-  }
+  const requiredCoverage = await mapLimit(REQUIRED_COVERAGE_BOARDS, 3, async (id) => {
+    if (byId.has(id)) return { id, status: "included_in_current_overview" };
+    try {
+      const html = await fetchText(`https://www.lwwhy.com/trading/sector/${id}`, 7_000);
+      return {
+        id,
+        status: "detail_only_excluded_from_ranking",
+        sessionDate: html.match(/>(\d{4}-\d{2}-\d{2})<\/a>/)?.[1] ?? null,
+        reason: "未出现在当日全量榜单，详情页可能滞后，仅完成覆盖检查",
+      };
+    } catch {
+      return { id, status: "source_unavailable", reason: "免费数据源未返回该板块" };
+    }
+  });
 
   const detailResults = await mapLimit(rankedSeeds, 8, async (board) => {
     try {
@@ -267,6 +283,8 @@ export async function getLiveMarket() {
       continuity: components.continuity,
       leaderCount: verifiedLeaders.length,
       historyValid: board.history.valid,
+      fiveDay: board.history.fiveDay,
+      positiveDays5: board.history.positiveDays5,
     });
     const leaders = verifiedLeaders.map((leader, index) => ({
       rank: index ? "龙二" : "龙一",
@@ -324,6 +342,12 @@ export async function getLiveMarket() {
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai" }).format(now);
   const sessionDate = themes.map((theme) => theme.sessionDate).sort().at(-1) ?? null;
   const marketStatus = sessionDate === today ? "trading" : "closed";
+  const monitoredThemes = themes.map((theme) => ({
+    ...theme,
+    confirmed: marketStatus === "trading" && theme.confirmed,
+  }));
+  const confirmedThemes = monitoredThemes.filter((theme) => theme.confirmed);
+  const firstCandidate = monitoredThemes.find((theme) => theme.phase !== "退潮");
   return {
     schemaVersion: 3,
     dataRevision: `live-${now.toISOString()}`,
@@ -340,19 +364,21 @@ export async function getLiveMarket() {
     coverage: {
       totalBoards: allBoards.length,
       deepAnalyzed: details.length,
-      displayed: themes.length,
-      requiredBoardsChecked: REQUIRED_COVERAGE_BOARDS,
+      displayed: monitoredThemes.length,
+      requiredBoardsChecked: requiredCoverage,
     },
     market: {
-      temperature: Math.round(themes.slice(0, 5).reduce((sum, theme) => sum + theme.score, 0) / 5),
-      mainlineCount: themes.filter((theme) => theme.confirmed).length,
+      temperature: Math.round(monitoredThemes.slice(0, 5).reduce((sum, theme) => sum + theme.score, 0) / 5),
+      mainlineCount: confirmedThemes.length,
       conclusion: marketStatus === "trading"
-        ? "前向监测中 · 仅输出候选，不输出买入结论"
+        ? confirmedThemes.length
+          ? "确认方向仍需等待下一次刷新验证"
+          : "暂无确认主线 · 仅保留候选观察"
         : "市场休市 · 展示最近交易日扫描结果",
-      strongestThemeId: themes[0]?.id ?? null,
-      nextThemeId: themes[1]?.id ?? null,
+      strongestThemeId: confirmedThemes[0]?.id ?? null,
+      nextThemeId: firstCandidate?.id ?? null,
     },
-    themes,
+    themes: monitoredThemes,
     methodology: {
       name: "前向监测模型 V4",
       weights: { capital: 25, strength: 25, breadth: 20, continuity: 15, leadership: 15 },
