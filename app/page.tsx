@@ -13,6 +13,7 @@ type Theme = {
   catalyst: string;
   invalidation: string;
   components: Record<string, number>;
+  leadRank: { rank: string; name: string; role: string }[];
   leaders: { capacity: string[]; trend: string[]; emotion: string[] };
   live: null | { board?: string; change: number; netIn: number; breadth: number | null };
 };
@@ -162,6 +163,10 @@ export default function Home() {
                 <span className="theme-name">
                   <strong>{theme.name}</strong>
                   <small><i className={theme.status} />{labels[theme.status]} · {theme.duration}</small>
+                  <span className="quick-leaders">
+                    <b>龙一 {theme.leadRank[0].name}</b>
+                    <b>龙二 {theme.leadRank[1].name}</b>
+                  </span>
                 </span>
                 <span className={`live-change ${(theme.live?.change ?? 0) < 0 ? "down" : ""}`}>
                   {theme.live ? `${theme.live.change >= 0 ? "+" : ""}${format.format(theme.live.change)}%` : "休市"}
@@ -189,8 +194,16 @@ export default function Home() {
                   <div key={key}><span>{componentLabels[key]}</span><b>{value}</b><i><em style={{ width: `${value * 5}%` }} /></i></div>
                 ))}
               </div>
+              <div className="dragon-rank">
+                {active.leadRank.map((leader) => (
+                  <div key={leader.rank}>
+                    <span>{leader.rank}</span>
+                    <p><b>{leader.name}</b><small>{leader.role}</small></p>
+                  </div>
+                ))}
+              </div>
               <div className="leader-stack">
-                <span>龙头分层</span>
+                <span>辅助梯队</span>
                 <p><b>容量中军</b>{active.leaders.capacity.join(" · ")}</p>
                 <p><b>趋势核心</b>{active.leaders.trend.join(" · ")}</p>
                 <p><b>情绪先锋</b>{active.leaders.emotion.join(" · ")}</p>
