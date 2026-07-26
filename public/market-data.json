@@ -31,8 +31,8 @@
       "netIn": 23.46458368,
       "mainNetRatio": 0,
       "breadth": 0.8333333333333334,
-      "leaderName": "至纯科技",
-      "leaderChange": 3.18,
+      "leaderName": "托伦斯",
+      "leaderChange": 20,
       "trend": {
         "fiveDay": 1.6785601660277205,
         "twentyDay": -21.369884158160303,
@@ -48,7 +48,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "至纯科技"
+          "code": "301583",
+          "name": "托伦斯",
+          "change": 20,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "300480",
+          "name": "光力科技",
+          "change": 20,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分100、强度分51、扩散分83、持续分18、龙头分69",
@@ -86,7 +96,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "长城军工"
+          "code": "601606",
+          "name": "长城军工",
+          "change": 9.99,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "300922",
+          "name": "天秦装备",
+          "change": 8.46,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分93、强度分60、扩散分50、持续分50、龙头分62",
@@ -124,7 +144,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "中国电信"
+          "code": "601728",
+          "name": "中国电信",
+          "change": 1.99,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "600941",
+          "name": "中国移动",
+          "change": 0.28,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分43、强度分34、扩散分100、持续分42、龙头分53",
@@ -238,7 +268,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "贝肯能源"
+          "code": "002828",
+          "name": "贝肯能源",
+          "change": 1.06,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "002207",
+          "name": "*ST准油",
+          "change": -1.86,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分79、强度分24、扩散分13、持续分61、龙头分35",
@@ -276,7 +316,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "交通银行"
+          "code": "601328",
+          "name": "交通银行",
+          "change": 1.29,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "601288",
+          "name": "农业银行",
+          "change": 1.06,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分7、强度分33、扩散分100、持续分37、龙头分53",
@@ -352,7 +402,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "安德利"
+          "code": "605198",
+          "name": "安德利",
+          "change": 10.01,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "300175",
+          "name": "朗源股份",
+          "change": 1.48,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分57、强度分23、扩散分40、持续分18、龙头分49",
@@ -428,7 +488,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "中信银行"
+          "code": "601998",
+          "name": "中信银行",
+          "change": 0.79,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "600036",
+          "name": "招商银行",
+          "change": 0.75,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分21、强度分29、扩散分56、持续分38、龙头分49",
@@ -504,7 +574,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "金牛化工"
+          "code": "600722",
+          "name": "金牛化工",
+          "change": 4.86,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "600844",
+          "name": "金煤科技",
+          "change": -1.63,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分29、强度分21、扩散分10、持续分54、龙头分35",
@@ -542,7 +622,17 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "盐湖股份"
+          "code": "000792",
+          "name": "盐湖股份",
+          "change": -2.65,
+          "membershipVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "000408",
+          "name": "藏格矿业",
+          "change": -2.76,
+          "membershipVerified": true
         }
       ],
       "signal": "资金分14、强度分35、扩散分0、持续分69、龙头分35",

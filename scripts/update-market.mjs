@@ -1,9 +1,18 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 const scale = (value, low, high) => clamp(((value - low) / (high - low)) * 100);
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 const NON_THEME_BOARD = /昨日|首板|连板|涨停|打板|新高|新低|触板|炸板|破净|融资融券|沪股通|深股通|标普|MSCI|富时罗素|机构重仓|基金重仓|社保重仓|QFII/;
+const previousLeadersById = new Map();
+try {
+  const previous = JSON.parse(await readFile("public/market-data.json", "utf8"));
+  for (const theme of previous.themes ?? []) {
+    if ((theme.leaders?.length ?? 0) >= 2) previousLeadersById.set(theme.id, theme.leaders);
+  }
+} catch {
+  // A first run has no previous verified snapshot to preserve.
+}
 
 async function fetchFirst(urls) {
   let lastError;
@@ -259,11 +268,15 @@ const scored = resolved.map((theme) => {
 const finalists = scored.sort((a, b) => b.score - a.score).slice(0, 30);
 await wait(8_000);
 const leaderResults = await mapLimit(finalists, 2, async (theme) => {
+  const preserved = previousLeadersById.get(theme.id);
   try {
     const leaders = await getLeaders(theme.id);
-    return { id: theme.id, leaders: leaders.length ? leaders : theme.leaders };
+    return {
+      id: theme.id,
+      leaders: leaders.length >= 2 ? leaders : preserved ?? (leaders.length ? leaders : theme.leaders),
+    };
   } catch {
-    return { id: theme.id, leaders: theme.leaders };
+    return { id: theme.id, leaders: preserved ?? theme.leaders };
   }
 });
 const leadersById = new Map(leaderResults.flatMap((result) =>

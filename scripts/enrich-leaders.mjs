@@ -5,7 +5,40 @@ const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value))
 const scale = (value, low, high) => clamp(((value - low) / (high - low)) * 100);
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
+async function fetchPublicBoardLeaders(code) {
+  const response = await fetch(`https://www.lwwhy.com/trading/sector/${code}`, {
+    headers: { "User-Agent": "Mozilla/5.0 MainlineRadarBot/3.0" },
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) throw new Error(`sector fallback ${response.status}`);
+  const html = await response.text();
+  const pattern = /quote\.eastmoney\.com\/(?:sh|sz|bj)(\d{6})\.html[^>]*>\1<\/a>\s*<a[^>]*>([^<]+)<\/a>\s*<span data-percent[^>]*>([-+]?\d+(?:\.\d+)?)%<\/span>/g;
+  const leaders = [];
+  const seen = new Set();
+  for (const match of html.matchAll(pattern)) {
+    const [, stockCode, rawName, rawChange] = match;
+    if (seen.has(stockCode)) continue;
+    seen.add(stockCode);
+    leaders.push({
+      rank: leaders.length ? "龙二" : "龙一",
+      code: stockCode,
+      name: rawName.trim(),
+      change: Number(rawChange),
+      membershipVerified: true,
+    });
+    if (leaders.length === 2) break;
+  }
+  if (leaders.length < 2) throw new Error(`fallback fewer than two constituents for ${code}`);
+  return leaders;
+}
+
 async function fetchLeaders(code) {
+  try {
+    return await fetchPublicBoardLeaders(code);
+  } catch {
+    // Fall back to the direct quote hosts.
+  }
+
   const params = new URLSearchParams({
     pn: "1",
     pz: "100",
@@ -50,6 +83,7 @@ async function fetchLeaders(code) {
       lastError = error;
     }
   }
+
   throw lastError;
 }
 

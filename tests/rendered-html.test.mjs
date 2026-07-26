@@ -56,6 +56,10 @@ test("published snapshot follows the V2 contract", async () => {
     assert.ok(["加速", "启动", "观察", "退潮"].includes(theme.phase));
     assert.equal(typeof theme.score, "number");
     assert.equal(theme.name, theme.matchedBoard);
+    if (theme.confirmed) {
+      assert.equal(theme.leaders.length, 2);
+      assert.ok(theme.leaders.every((leader) => leader.membershipVerified === true));
+    }
     assert.deepEqual(
       Object.keys(theme.components).sort(),
       ["breadth", "capital", "continuity", "leadership", "strength"],
