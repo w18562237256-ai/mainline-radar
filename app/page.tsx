@@ -84,6 +84,19 @@ function jsonp<T>(base: string, params: URLSearchParams, timeout = 8_000) {
 }
 
 async function browserLeaders(code: string) {
+  try {
+    const response = await fetch(`/api/leaders?board=${encodeURIComponent(code)}`, { cache: "no-store" });
+    const payload = await response.json() as {
+      available?: boolean;
+      leaders?: { rank: string; code: string; name: string; change: number; membershipVerified: true }[];
+    };
+    if (response.ok && payload.available && (payload.leaders?.length ?? 0) >= 2) {
+      return payload.leaders!;
+    }
+  } catch {
+    // Try the direct free quote endpoint below.
+  }
+
   const params = new URLSearchParams({
     pn: "1", pz: "100", po: "1", np: "1",
     ut: "bd1d9ddb04089700cf9c27f6f7426281",
@@ -276,7 +289,7 @@ export default function Home() {
 
             <div className="leader-line">
               <div><span>龙一</span><b>{strongest?.leaders[0]?.name ?? "待确认"}</b><em>{strongest?.leaders[0]?.change != null ? signed(strongest.leaders[0].change) : strongest ? signed(strongest.leaderChange) : ""}</em></div>
-              <div><span>龙二</span><b>{strongest?.leaders[1]?.name ?? "补全中"}</b><em>{strongest?.leaders[1]?.change != null ? signed(strongest.leaders[1].change) : ""}</em></div>
+              <div><span>龙二</span><b>{strongest?.leaders[1]?.name ?? "暂无已核验"}</b><em>{strongest?.leaders[1]?.change != null ? signed(strongest.leaders[1].change) : ""}</em></div>
             </div>
 
             <div className="today-metrics">
@@ -334,7 +347,7 @@ export default function Home() {
                     <b>{theme.name}</b>
                     <small>
                       龙一 {theme.leaders[0]?.name ?? "待确认"} {theme.leaders[0]?.change != null ? signed(theme.leaders[0].change) : ""}
-                      {" · "}龙二 {theme.leaders[1]?.name ?? "补全中"} {theme.leaders[1]?.change != null ? signed(theme.leaders[1].change) : ""}
+                      {" · "}龙二 {theme.leaders[1]?.name ?? "暂无已核验"} {theme.leaders[1]?.change != null ? signed(theme.leaders[1].change) : ""}
                     </small>
                   </span>
                   <i className={`phase-badge ${phaseClass[theme.phase]}`}>{theme.phase}</i>
