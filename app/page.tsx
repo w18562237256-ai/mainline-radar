@@ -50,6 +50,10 @@ function returnClass(value: number) {
   return value >= 0 ? "up" : "down";
 }
 
+function periodTitle(label: string, score: number) {
+  return score >= 58 ? label : label.replace("主线", "领先（未确认）");
+}
+
 export default function Home() {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,9 +125,9 @@ export default function Home() {
               const theme = findTheme(item.id);
               return (
                 <article className={index === 1 ? "main-card" : ""} key={String(label)}>
-                  <span>{label} · {period as string}</span>
+                  <span>{periodTitle(String(label), item.score)} · {period as string}</span>
                   <h2>{item.name}</h2>
-                  <strong>{item.strength} · {item.score}分</strong>
+                  <strong>{item.strength} · {item.score}分{item.score < 58 ? " · 暂不确认主线" : ""}</strong>
                   <p>
                     龙一 {theme?.leaders[0]?.name ?? "待确认"} ·
                     龙二 {theme?.leaders[1]?.name ?? "待确认"}

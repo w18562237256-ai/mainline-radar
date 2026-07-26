@@ -17,7 +17,15 @@ jobs:
         with:
           node-version: "22"
       - name: Fetch and calculate market data
-        run: node scripts/update-market.mjs
+        run: |
+          for attempt in 1 2 3; do
+            if node scripts/update-market.mjs; then
+              exit 0
+            fi
+            echo "Data source attempt $attempt failed; retrying shortly"
+            sleep 30
+          done
+          exit 1
       - name: Commit refreshed snapshot
         run: |
           if [ -z "$(git status --porcelain -- public/market-data.json docs/market-data.json)" ]; then
