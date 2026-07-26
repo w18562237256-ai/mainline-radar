@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type PeriodLeader = { id: string; name: string; score: number; strength: string };
 type Theme = {
@@ -29,6 +29,57 @@ type Payload = {
 };
 
 const number = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
+const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
+const scale = (value: number, low: number, high: number) => clamp(((value - low) / (high - low)) * 100);
+
+type EastmoneyStock = { f14?: string; f3?: number; f6?: number; f109?: number };
+
+function browserLeaders(code: string) {
+  return new Promise<Theme["leaders"]>((resolve, reject) => {
+    const callback = `mainlineRadar_${code}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const params = new URLSearchParams({
+      cb: callback,
+      pn: "1",
+      pz: "100",
+      po: "1",
+      np: "1",
+      ut: "bd1d9ddb04089700cf9c27f6f7426281",
+      fltt: "2",
+      invt: "2",
+      fid: "f3",
+      fs: `b:${code} f:!50`,
+      fields: "f14,f3,f6,f109",
+      _: String(Date.now()),
+    });
+    const script = document.createElement("script");
+    const timer = window.setTimeout(() => finish(new Error("timeout")), 8_000);
+    const callbacks = window as unknown as Record<string, (payload: { data?: { diff?: EastmoneyStock[] } }) => void>;
+
+    function finish(error?: Error, leaders?: Theme["leaders"]) {
+      window.clearTimeout(timer);
+      script.remove();
+      delete callbacks[callback];
+      if (error) reject(error);
+      else resolve(leaders ?? []);
+    }
+
+    callbacks[callback] = (payload) => {
+      const stocks = (payload.data?.diff ?? []).filter((stock) => stock.f14 && !stock.f14.includes("退"));
+      const maxAmount = Math.max(...stocks.map((stock) => Number(stock.f6 ?? 0)), 1);
+      const leaders = stocks.map((stock) => ({
+        name: String(stock.f14),
+        score: scale(Number(stock.f109 ?? stock.f3 ?? 0), -5, 20) * .45
+          + scale(Number(stock.f3 ?? 0), -3, 10) * .25
+          + (Number(stock.f6 ?? 0) / maxAmount) * 30,
+      })).sort((a, b) => b.score - a.score).slice(0, 2)
+        .map((stock, index) => ({ rank: index ? "龙二" : "龙一", name: stock.name }));
+      finish(leaders.length >= 2 ? undefined : new Error("insufficient constituents"), leaders);
+    };
+    script.onerror = () => finish(new Error("network"));
+    script.src = `https://29.push2.eastmoney.com/api/qt/clist/get?${params}`;
+    document.head.appendChild(script);
+  });
+}
 
 function advice(score: number) {
   if (score >= 75) return "很强，别追高";
@@ -58,12 +109,41 @@ export default function Home() {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<"current" | "day" | "mid">("current");
+  const [leaderFill, setLeaderFill] = useState<"idle" | "loading" | "done">("idle");
+  const enriching = useRef(false);
 
-  async function load() {
+  const fillLeaders = useCallback(async (payload: Payload) => {
+    if (enriching.current || !payload.available) return;
+    const targets = payload.themes.filter((theme) => theme.leaders.length < 2);
+    if (!targets.length) {
+      setLeaderFill("done");
+      return;
+    }
+    enriching.current = true;
+    setLeaderFill("loading");
+    for (const theme of targets) {
+      try {
+        const leaders = await browserLeaders(theme.id);
+        setData((current) => current ? {
+          ...current,
+          themes: current.themes.map((item) => item.id === theme.id ? { ...item, leaders } : item),
+        } : current);
+      } catch {
+        // Keep the server-verified Dragon 1 when the visitor's network also blocks the free endpoint.
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 250));
+    }
+    enriching.current = false;
+    setLeaderFill("done");
+  }, []);
+
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch("/api/market", { cache: "no-store" });
-      setData(await response.json());
+      const payload = await response.json() as Payload;
+      setData(payload);
+      void fillLeaders(payload);
     } catch {
       setData({
         available: false, sourceLabel: "行情数据暂时未连接", sessionDate: null,
@@ -73,13 +153,13 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [fillLeaders]);
 
   useEffect(() => {
-    load();
+    void Promise.resolve().then(load);
     const timer = window.setInterval(load, 60_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [load]);
 
   const themes = useMemo(
     () => [...(data?.themes ?? [])].sort((a, b) => b.scores[sortBy] - a.scores[sortBy]),
@@ -99,7 +179,11 @@ export default function Home() {
           <i className={data?.available ? "live" : ""} />
           <span>
             <b>{data?.sourceLabel ?? "正在连接"}</b>
-            <small>{data?.sessionDate ? `交易日 ${data.sessionDate}` : "暂停判断"}</small>
+            <small>
+              {data?.sessionDate
+                ? `交易日 ${data.sessionDate}${leaderFill === "loading" ? " · 正在免费补全龙头" : ""}`
+                : "暂停判断"}
+            </small>
           </span>
           <button onClick={load} disabled={loading}>{loading ? "更新中" : "更新"}</button>
         </div>
