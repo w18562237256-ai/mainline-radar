@@ -42,6 +42,8 @@ test("V2 model owns ranking, phases, and five-factor weights", async () => {
   assert.match(script, /breadth: 20/);
   assert.match(script, /continuity: 15/);
   assert.match(script, /leadership: 10/);
+  assert.match(script, /leaderAvgChange >= 7/);
+  assert.match(script, /components\.continuity >= 45/);
   assert.doesNotMatch(script, /dayScore|currentScore|midScore/);
 });
 
@@ -52,6 +54,10 @@ test("published snapshot follows the V2 contract", async () => {
   assert.equal(snapshot.schemaVersion, 2);
   assert.ok(snapshot.themes.length > 0);
   assert.notEqual(snapshot.market.strongestThemeId, snapshot.market.nextThemeId);
+  const military = snapshot.themes.find((theme) => theme.id === "BK1382");
+  assert.equal(military.phase, "加速");
+  assert.equal(military.leaders[1].name, "建设工业");
+  assert.match(military.signal, /核心股加速|龙头梯队/);
   for (const theme of snapshot.themes) {
     assert.ok(["加速", "启动", "观察", "退潮"].includes(theme.phase));
     assert.equal(typeof theme.score, "number");

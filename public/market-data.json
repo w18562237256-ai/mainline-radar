@@ -10,11 +10,11 @@
     "displayed": 14
   },
   "market": {
-    "temperature": 56,
+    "temperature": 63,
     "mainlineCount": 2,
-    "conclusion": "弱市聚焦 · 主线待扩散",
-    "strongestThemeId": "BK1326",
-    "nextThemeId": "BK1382"
+    "conclusion": "兵装重组核心加速 · 半导体设备启动",
+    "strongestThemeId": "BK1382",
+    "nextThemeId": "BK1326"
   },
   "themes": [
     {
@@ -72,8 +72,8 @@
       "matchedBoard": "地面兵装Ⅲ",
       "boardType": "行业板块",
       "sessionDate": "2026-07-24",
-      "score": 67,
-      "phase": "启动",
+      "score": 73,
+      "phase": "加速",
       "confirmed": true,
       "change": 2.1,
       "netIn": 3.82371552,
@@ -84,14 +84,14 @@
       "trend": {
         "fiveDay": 10.107717132358541,
         "twentyDay": -4.132252862488062,
-        "positiveDays5": 0
+        "positiveDays5": 3
       },
       "components": {
         "capital": 93,
         "strength": 60,
         "breadth": 50,
-        "continuity": 50,
-        "leadership": 62
+        "continuity": 65,
+        "leadership": 100
       },
       "leaders": [
         {
@@ -103,15 +103,15 @@
         },
         {
           "rank": "龙二",
-          "code": "300922",
-          "name": "天秦装备",
-          "change": 8.46,
+          "code": "002265",
+          "name": "建设工业",
+          "change": 10.01,
           "membershipVerified": true
         }
       ],
-      "signal": "资金分93、强度分60、扩散分50、持续分50、龙头分62",
-      "action": "加入重点观察，确认下一次刷新仍有资金承接",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效"
+      "signal": "兵装重组核心股加速：长城军工2连板，建设工业连续3日累计涨幅偏离超过20%；但行业板块仅6涨6跌，属于核心加速、尚未全面扩散",
+      "action": "核心股已进入加速段，不追一致；观察长城军工、建设工业分歧后的承接，以及上涨家数能否扩大",
+      "risk": "长城军工与建设工业同时断板或转弱，且板块上涨家数仍未扩散时，加速信号失效"
     },
     {
       "id": "BK1587",

@@ -120,6 +120,8 @@ async function getLeaders(code) {
     code: stock.f12,
     name: stock.f14,
     change: Number(stock.f3 ?? 0),
+    momentum5d: Number(stock.f109 ?? stock.f3 ?? 0),
+    amount: Number(stock.f6 ?? 0),
     score: scale(Number(stock.f109 ?? stock.f3 ?? 0), -5, 20) * .45
       + scale(Number(stock.f3 ?? 0), -3, 10) * .25
       + (Number(stock.f6 ?? 0) / maxAmount) * 30,
@@ -129,6 +131,8 @@ async function getLeaders(code) {
       code: stock.code,
       name: stock.name,
       change: stock.change,
+      momentum5d: stock.momentum5d,
+      amount: stock.amount,
       membershipVerified: true,
     }));
 }
@@ -167,10 +171,10 @@ function phaseFor(theme) {
     || (theme.components.capital < 30 && theme.netIn < 0)
   ) return "退潮";
   if (
-    theme.score >= 72
-    && theme.change >= 1.8
+    theme.score >= 70
+    && theme.components.continuity >= 45
+    && theme.leaderAvgChange >= 7
     && theme.trend.fiveDay >= 5
-    && theme.leaderChange >= 6
   ) return "加速";
   if (
     theme.score >= 62
@@ -179,6 +183,32 @@ function phaseFor(theme) {
     && theme.change >= .5
   ) return "启动";
   return "观察";
+}
+
+function scoreFromComponents(components) {
+  return Math.round(
+    components.capital * .3
+    + components.strength * .25
+    + components.breadth * .2
+    + components.continuity * .15
+    + components.leadership * .1,
+  );
+}
+
+function signalFor(theme) {
+  const leaderText = theme.leaders.length >= 2
+    ? `${theme.leaders[0].name}、${theme.leaders[1].name}形成龙头梯队`
+    : "龙头梯队尚未完整核验";
+  if (theme.phase === "加速") {
+    return `${leaderText}，核心平均涨幅${theme.leaderAvgChange.toFixed(1)}%，近5日板块涨幅${theme.trend.fiveDay.toFixed(1)}%；核心加速，仍需观察扩散`;
+  }
+  if (theme.phase === "启动") {
+    return `${leaderText}，资金、当日强度开始共振；持续性分${theme.components.continuity}，尚未达到加速标准`;
+  }
+  if (theme.phase === "退潮") {
+    return `板块涨幅、资金或上涨家数转弱，当前不具备主线进攻条件`;
+  }
+  return `资金分${theme.components.capital}、强度分${theme.components.strength}、扩散分${theme.components.breadth}，尚未同时满足主线条件`;
 }
 
 function actionFor(phase) {
@@ -239,13 +269,7 @@ const scored = resolved.map((theme) => {
       (theme.leaderName ? 30 : 0) + scale(theme.leaderChange, -2, 10) * .7,
     ),
   };
-  const score = Math.round(
-    components.capital * .3
-    + components.strength * .25
-    + components.breadth * .2
-    + components.continuity * .15
-    + components.leadership * .1,
-  );
+  const score = scoreFromComponents(components);
   const base = { ...theme, name: theme.rawName, components, score };
   const phase = phaseFor(base);
   const confirmed = score >= 65 && phase !== "退潮" && components.capital >= 45 && components.breadth >= 40;
@@ -282,7 +306,34 @@ const leaderResults = await mapLimit(finalists, 2, async (theme) => {
 const leadersById = new Map(leaderResults.flatMap((result) =>
   result.status === "fulfilled" ? [[result.value.id, result.value.leaders]] : [],
 ));
-const themes = finalists.map((theme) => ({ ...theme, leaders: leadersById.get(theme.id) ?? theme.leaders }));
+const themes = finalists.map((theme) => {
+  const leaders = leadersById.get(theme.id) ?? theme.leaders;
+  const leaderAvgChange = leaders.length
+    ? leaders.reduce((sum, leader) => sum + Number(leader.change ?? 0), 0) / leaders.length
+    : Number(theme.leaderChange ?? 0);
+  const leaderMomentum = Math.max(...leaders.map((leader) => Number(leader.momentum5d ?? leader.change ?? 0)), 0);
+  const components = {
+    ...theme.components,
+    leadership: Math.round(clamp(
+      (leaders.length >= 2 ? 30 : leaders.length ? 15 : 0)
+      + scale(leaderAvgChange, -2, 10) * .45
+      + scale(leaderMomentum, -5, 25) * .25,
+    )),
+  };
+  const score = scoreFromComponents(components);
+  const base = { ...theme, leaders, leaderAvgChange, components, score };
+  const phase = phaseFor(base);
+  const confirmed = score >= 65 && phase !== "退潮" && components.capital >= 45 && components.breadth >= 40;
+  const result = { ...base, phase, confirmed };
+  return {
+    ...result,
+    signal: signalFor(result),
+    action: actionFor(phase),
+    risk: phase === "加速"
+      ? "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效"
+      : "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+  };
+}).sort((a, b) => b.score - a.score);
 const topFive = themes.slice(0, 5);
 const temperature = Math.round(topFive.reduce((sum, theme) => sum + theme.score, 0) / Math.max(topFive.length, 1));
 const mainlineCount = themes.filter((theme) => theme.confirmed).length;

@@ -89,6 +89,12 @@ async function fetchLeaders(code) {
 
 let enriched = 0;
 for (const theme of snapshot.themes ?? []) {
+  if (
+    theme.leaders?.length >= 2
+    && theme.leaders.every((leader) => leader.membershipVerified === true)
+  ) {
+    continue;
+  }
   try {
     theme.leaders = await fetchLeaders(theme.id);
     enriched += 1;
