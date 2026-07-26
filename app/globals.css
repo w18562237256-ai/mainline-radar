@@ -77,10 +77,18 @@ nav a { font-size: 12px; color: #555d66; text-decoration: none; }
 .board-name small { color: var(--muted); font-size: 9px; line-height: 1.5; max-width: 300px; }
 .state { font-size: 10px; font-weight: 700; }
 .state i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.state small { display: block; margin: 3px 0 0 14px; color: #8e9399; font-size: 8px; font-weight: 500; }
 .state.go { color: var(--red); }.state.go i { background: var(--red); }
 .state.wait { color: #a26c0e; }.state.wait i { background: var(--amber); }
 .state.turn { color: var(--blue); }.state.turn i { background: var(--blue); }
 .state.risk { color: #777; }.state.risk i { background: #aaa; }
+.phase-legend { display: flex; flex-wrap: wrap; gap: 9px; margin: -8px 0 18px; }
+.phase-legend > span { min-width: 108px; padding: 8px 11px; border: 1px solid #e2e4e6; border-radius: 8px; background: #fff; font-size: 11px; font-weight: 800; }
+.phase-legend small { display: block; margin-top: 2px; color: #8e9399; font-size: 8px; font-weight: 500; }
+.phase-legend .go { color: var(--red); border-color: #efc8c2; }
+.phase-legend .turn { color: var(--blue); border-color: #c5d4e7; }
+.phase-legend .wait { color: #a26c0e; border-color: #ead9ad; }
+.phase-legend .risk { color: #777; }
 .dragons { display: grid; gap: 6px; }
 .dragons b { font-size: 10px; font-weight: 600; }
 .dragons em { display: inline-block; width: 34px; margin-right: 6px; padding: 2px 4px; background: #fff0ed; color: #aa372c; font-style: normal; font-size: 8px; text-align: center; }

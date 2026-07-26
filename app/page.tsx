@@ -97,6 +97,20 @@ function themeRole(theme: Theme, leaders: Payload["leaders"]) {
   return roles.length ? `${roles.join("＋")}最强` : "跟踪板块";
 }
 
+function marketPhase(theme: Theme) {
+  const { day, fiveDay } = theme.returns;
+  if (day <= -2 || theme.breadth <= .25 || (day < 0 && theme.netIn < 0)) {
+    return { label: "退潮", className: "risk" };
+  }
+  if (day >= 2 && fiveDay >= 6 && theme.breadth >= .5 && theme.netIn > 0) {
+    return { label: "加速", className: "go" };
+  }
+  if (day >= 1.2 && theme.breadth >= .55 && theme.netIn > 0) {
+    return { label: "启动", className: "turn" };
+  }
+  return { label: "观察", className: "wait" };
+}
+
 function returnClass(value: number) {
   return value >= 0 ? "up" : "down";
 }
@@ -207,11 +221,15 @@ export default function Home() {
             ].map(([label, period, leader], index) => {
               const item = leader as PeriodLeader;
               const theme = findTheme(item.id);
+              const phase = theme ? marketPhase(theme) : null;
               return (
                 <article className={index === 1 ? "main-card" : ""} key={String(label)}>
                   <span>{periodTitle(String(label), item.score)} · {period as string}</span>
                   <h2>{item.name}</h2>
-                  <strong>{item.strength} · {item.score}分{item.score < 58 ? " · 暂不确认主线" : ""}</strong>
+                  <strong>
+                    {phase ? `${phase.label} · ` : ""}{item.strength} · {item.score}分
+                    {item.score < 58 ? " · 暂不确认主线" : ""}
+                  </strong>
                   <p>
                     龙一 {theme?.leaders[0]?.name ?? "待确认"} ·
                     龙二 {theme?.leaders[1]?.name ?? "待确认"}
@@ -249,6 +267,12 @@ export default function Home() {
             <button className={sortBy === "day" ? "active" : ""} onClick={() => setSortBy("day")}>今日</button>
           </div>
         </div>
+        <div className="phase-legend" aria-label="板块阶段说明">
+          <span className="go">加速<small>持续走强</small></span>
+          <span className="turn">启动<small>刚刚转强</small></span>
+          <span className="wait">观察<small>尚未确认</small></span>
+          <span className="risk">退潮<small>强度回落</small></span>
+        </div>
 
         {data?.available ? (
           <>
@@ -256,11 +280,15 @@ export default function Home() {
               <div className="board-head dynamic-head">
                 <span>板块</span><span>系统身份</span><span>龙一 / 龙二</span><span>今日</span><span>近5日</span><span>近20日</span><span>提醒</span>
               </div>
-              {themes.map((theme) => (
+              {themes.map((theme) => {
+                const phase = marketPhase(theme);
+                return (
                 <details className="board-row" key={theme.id}>
                   <summary className="dynamic-row">
                     <span className="board-name"><b>{theme.name}</b><small>{theme.boardType ?? "板块"} · {theme.matchedBoard}</small></span>
-                    <span className="state wait"><i />{themeRole(theme, data.leaders)}</span>
+                    <span className={`state ${phase.className}`}>
+                      <i />{phase.label}<small>{themeRole(theme, data.leaders)}</small>
+                    </span>
                     <span className="dragons">
                       <b><em>龙一</em>{theme.leaders[0]?.name ?? "待确认"}</b>
                       <b><em>龙二</em>{theme.leaders[1]?.name ?? "待确认"}</b>
@@ -278,7 +306,8 @@ export default function Home() {
                     <div><b>模型分</b><p>今日 {theme.scores.day} · 近5日 {theme.scores.current} · 近20日 {theme.scores.mid}</p></div>
                   </div>
                 </details>
-              ))}
+                );
+              })}
             </div>
             <p className="rank-note">龙一、龙二按板块内近5日强度、当日强度和成交容量综合排序；并非人工固定名单。</p>
           </>
