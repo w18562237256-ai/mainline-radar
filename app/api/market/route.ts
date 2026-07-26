@@ -169,6 +169,21 @@ function confidence(score: number) {
 
 export async function GET() {
   try {
+    const snapshot = await fetch(
+      "https://raw.githubusercontent.com/w18562237256-ai/mainline-radar/main/public/market-data.json",
+      { signal: AbortSignal.timeout(5000), cache: "no-store" },
+    );
+    if (snapshot.ok) {
+      const payload = await snapshot.json() as Record<string, unknown>;
+      return NextResponse.json(payload, {
+        headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+      });
+    }
+  } catch {
+    // Fall through to direct market access when the synchronized snapshot is unavailable.
+  }
+
+  try {
     const boards = await getBoards();
     if (!boards.length) throw new Error("empty market data");
 
