@@ -2,33 +2,54 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type PeriodLeader = { id: string; name: string; score: number; strength: string };
+type Phase = "加速" | "启动" | "观察" | "退潮";
+type Components = {
+  capital: number;
+  strength: number;
+  breadth: number;
+  continuity: number;
+  leadership: number;
+};
 type Theme = {
   id: string;
   name: string;
+  rawName?: string;
   matchedBoard: string;
   boardType?: string;
-  scores: { day: number; current: number; mid: number };
-  returns: { day: number; fiveDay: number; twentyDay: number };
+  score: number;
+  phase: Phase;
+  confirmed: boolean;
+  change: number;
+  mainNetRatio: number;
   breadth: number;
   netIn: number;
+  leaderName?: string | null;
+  leaderChange: number;
+  trend: { fiveDay: number; twentyDay: number; positiveDays5: number };
+  components: Components;
   leaders: { rank: string; name: string }[];
-  catalyst: string;
+  signal: string;
+  action: string;
   risk: string;
   sessionDate: string;
 };
 type Payload = {
+  schemaVersion: 2;
   available: boolean;
   sourceLabel: string;
   sessionDate: string | null;
   updatedAt: string | null;
-  leaders: null | { day: PeriodLeader; current: PeriodLeader; mid: PeriodLeader };
+  market: {
+    temperature: number;
+    mainlineCount: number;
+    conclusion: string;
+    strongestThemeId: string | null;
+    nextThemeId: string | null;
+  };
   themes: Theme[];
-  method: string;
-  coverage?: { totalBoards: number; deepAnalyzed: number; displayed: number };
+  methodology: { name: string; weights: Components; rule: string };
+  coverage: { totalBoards: number; deepAnalyzed: number; displayed: number };
 };
-type Phase = "加速" | "启动" | "观察" | "退潮";
-type RankedTheme = Theme & { phase: Phase; overall: number };
 type IndexQuote = { name: string; value: number; change: number };
 type EastmoneyStock = { f14?: string; f3?: number; f6?: number; f109?: number };
 
@@ -103,18 +124,6 @@ async function browserIndexes() {
   }));
 }
 
-function marketPhase(theme: Theme): Phase {
-  const { day, fiveDay } = theme.returns;
-  if (day <= -2 || theme.breadth <= .25 || (day < 0 && theme.netIn < 0)) return "退潮";
-  if (day >= 2 && fiveDay >= 6 && theme.breadth >= .5 && theme.netIn > 0) return "加速";
-  if (day >= 1.2 && theme.breadth >= .55 && theme.netIn > 0) return "启动";
-  return "观察";
-}
-
-function overallScore(theme: Theme) {
-  return Math.round(theme.scores.day * .3 + theme.scores.current * .5 + theme.scores.mid * .2);
-}
-
 function signed(value: number, suffix = "%") {
   return `${value >= 0 ? "+" : ""}${number.format(value)}${suffix}`;
 }
@@ -180,13 +189,25 @@ export default function Home() {
       void browserIndexes().then(setIndexes).catch(() => undefined);
     } catch {
       setData({
+        schemaVersion: 2,
         available: false,
         sourceLabel: "行情数据暂时未连接",
         sessionDate: null,
         updatedAt: null,
-        leaders: null,
+        coverage: { totalBoards: 0, deepAnalyzed: 0, displayed: 0 },
+        market: {
+          temperature: 0,
+          mainlineCount: 0,
+          conclusion: "数据中断 · 暂停判断",
+          strongestThemeId: null,
+          nextThemeId: null,
+        },
         themes: [],
-        method: "数据源中断时暂停判断，不使用旧结论冒充实时结果。",
+        methodology: {
+          name: "主线共振模型 V2",
+          weights: { capital: 30, strength: 25, breadth: 20, continuity: 15, leadership: 10 },
+          rule: "数据源中断时暂停判断，不使用旧结论冒充实时结果。",
+        },
       });
     } finally {
       setLoading(false);
@@ -203,12 +224,8 @@ export default function Home() {
     };
   }, [load]);
 
-  const ranked = useMemo<RankedTheme[]>(
-    () => (data?.themes ?? []).map((theme) => ({
-      ...theme,
-      phase: marketPhase(theme),
-      overall: overallScore(theme),
-    })).sort((a, b) => b.overall - a.overall),
+  const ranked = useMemo<Theme[]>(
+    () => [...(data?.themes ?? [])].sort((a, b) => b.score - a.score),
     [data],
   );
 
@@ -226,30 +243,26 @@ export default function Home() {
     );
     return [...filtered].sort((a, b) => {
       if (sortBy === "money") return b.netIn - a.netIn;
-      if (sortBy === "gain") return b.returns.day - a.returns.day;
-      return b.overall - a.overall;
+      if (sortBy === "gain") return b.change - a.change;
+      return b.score - a.score;
     });
   }, [ranked, phaseFilter, query, sortBy]);
 
-  const strongest = ranked[0];
-  const launchTheme = ranked.find((theme) => theme.phase === "启动") ?? ranked[1];
+  const strongest = ranked.find((theme) => theme.id === data?.market.strongestThemeId) ?? ranked[0];
+  const launchTheme = ranked.find((theme) =>
+    theme.id === data?.market.nextThemeId && theme.id !== strongest?.id
+  ) ?? ranked.find((theme) => theme.phase === "启动" && theme.id !== strongest?.id) ?? ranked[1];
   const second = ranked.find((theme) => theme.id !== strongest?.id && theme.id !== launchTheme?.id) ?? ranked[1];
   const riskTheme = ranked.find((theme) => theme.phase === "退潮") ?? ranked.at(-1);
-  const temperature = strongest
-    ? Math.round(clamp(strongest.overall * .72 + strongest.breadth * 28))
-    : 0;
-  const confirmed = ranked.filter((theme) => theme.overall >= 58).length;
+  const temperature = data?.market.temperature ?? 0;
+  const confirmed = data?.market.mainlineCount ?? 0;
   const attackCount = phaseCounts.加速 + phaseCounts.启动;
-  const marketSummary = temperature >= 70
-    ? "主线清晰 · 资金聚焦"
-    : temperature >= 55
-      ? "弱市聚焦 · 等待扩散"
-      : "轮动观察 · 控制追高";
+  const marketSummary = data?.market.conclusion ?? "等待有效数据";
   const earlyLeaders = ranked
     .filter((theme) => theme.leaders[0])
     .sort((a, b) => {
-      const phaseWeight = (theme: RankedTheme) => theme.phase === "启动" ? 20 : theme.phase === "观察" ? 10 : 0;
-      return (b.overall + phaseWeight(b)) - (a.overall + phaseWeight(a));
+      const phaseWeight = (theme: Theme) => theme.phase === "启动" ? 20 : theme.phase === "观察" ? 10 : 0;
+      return (b.score + phaseWeight(b)) - (a.score + phaseWeight(a));
     })
     .slice(0, 3);
   const maxFlow = Math.max(...ranked.map((theme) => Math.abs(theme.netIn)), 1);
@@ -292,7 +305,7 @@ export default function Home() {
           <span>扫描板块</span><b>{data?.coverage?.totalBoards ?? "—"}</b><em>行业＋概念</em>
         </div>
         <div className="quote-box">
-          <span>主线数量</span><b>{confirmed}</b><em>评分 ≥ 58</em>
+          <span>确认主线</span><b>{confirmed}</b><em>共振阈值 ≥ 65</em>
         </div>
         <div className="quote-box">
           <span>自动刷新</span><b>20<small>秒</small></b><em>原地更新</em>
@@ -316,7 +329,7 @@ export default function Home() {
           <div className="focus-chip">
             <small>监测方向</small>
             <b>{strongest?.name ?? "等待行情"}</b>
-            <span>机会分 <strong>{strongest?.overall ?? "—"}</strong></span>
+            <span>共振分 <strong>{strongest?.score ?? "—"}</strong></span>
             <span>阶段 <strong>{strongest?.phase ?? "—"}</strong></span>
           </div>
         </div>
@@ -359,12 +372,12 @@ export default function Home() {
             ["第二候选", second, "candidate"],
             ["风险方向", riskTheme, "risk"],
           ].map(([label, themeValue, tone]) => {
-            const theme = themeValue as RankedTheme | undefined;
+            const theme = themeValue as Theme | undefined;
             return (
               <article className={`signal-card ${tone}`} key={String(label)}>
                 <span>{String(label)}</span>
                 <h3>{theme?.name ?? "暂无"}</h3>
-                <div><b>{theme?.overall ?? "—"}</b><small>评分</small></div>
+                <div><b>{theme?.score ?? "—"}</b><small>共振分</small></div>
                 <p>{theme ? `${theme.phase} · ${money(theme.netIn)} · 龙一 ${theme.leaders[0]?.name ?? "待确认"}` : "等待有效行情"}</p>
               </article>
             );
@@ -381,16 +394,16 @@ export default function Home() {
               <article key={theme.id}>
                 <div className="leader-card-top">
                   <span className={`phase-pill ${phaseClass[theme.phase]}`}>{theme.phase}</span>
-                  <b>{theme.overall}</b>
+                  <b>{theme.score}</b>
                 </div>
                 <h3>{theme.leaders[0]?.name ?? "待确认"}</h3>
-                <p>{theme.name} · 评分 {theme.overall}</p>
+                <p>{theme.name} · 共振分 {theme.score}</p>
                 <dl>
                   <div><dt>资金</dt><dd>{money(theme.netIn)}</dd></div>
                   <div><dt>扩散</dt><dd>{integer.format(theme.breadth * 100)}%</dd></div>
-                  <div><dt>板块涨幅</dt><dd>{signed(theme.returns.day)}</dd></div>
+                  <div><dt>板块涨幅</dt><dd>{signed(theme.change)}</dd></div>
                 </dl>
-                <strong>{theme.phase === "加速" ? "风险：不建议盲目追高" : "动作：加入观察，等待承接"}</strong>
+                <strong>{theme.action}</strong>
               </article>
             ))}
           </div>
@@ -429,18 +442,20 @@ export default function Home() {
                 <summary>
                   <span className="rank-name"><em>{String(index + 1).padStart(2, "0")}</em><b>{theme.name}</b><small>{theme.matchedBoard} · {theme.leaders[0]?.name ?? "龙头待确认"}</small></span>
                   <span><i className={`phase-pill ${phaseClass[theme.phase]}`}>{theme.phase}</i></span>
-                  <span className="score-cell">{theme.overall}</span>
-                  <span className={theme.returns.day >= 0 ? "positive" : "negative"}>{signed(theme.returns.day)}</span>
+                  <span className="score-cell">{theme.score}</span>
+                  <span className={theme.change >= 0 ? "positive" : "negative"}>{signed(theme.change)}</span>
                   <span className={theme.netIn >= 0 ? "positive" : "negative"}>{money(theme.netIn)}</span>
-                  <span className="trend-cell"><i style={{ width: `${clamp(theme.overall)}%` }} /></span>
+                  <span className="trend-cell"><i style={{ width: `${clamp(theme.score)}%` }} /></span>
                 </summary>
                 <div className="row-detail">
-                  <div><span>龙一</span><b>{theme.leaders[0]?.name ?? "待确认"}</b></div>
-                  <div><span>龙二</span><b>{theme.leaders[1]?.name ?? "待确认"}</b></div>
-                  <div><span>近5日</span><b>{signed(theme.returns.fiveDay)}</b></div>
-                  <div><span>近20日</span><b>{signed(theme.returns.twentyDay)}</b></div>
-                  <p><b>观察依据：</b>{theme.catalyst}</p>
-                  <p><b>失效条件：</b>{theme.risk}</p>
+                  <div><span>资金 30%</span><b>{theme.components.capital}</b></div>
+                  <div><span>强度 25%</span><b>{theme.components.strength}</b></div>
+                  <div><span>扩散 20%</span><b>{theme.components.breadth}</b></div>
+                  <div><span>持续 15%</span><b>{theme.components.continuity}</b></div>
+                  <div><span>龙头 10%</span><b>{theme.components.leadership}</b></div>
+                  <div><span>龙一 / 龙二</span><b>{theme.leaders[0]?.name ?? "待确认"} / {theme.leaders[1]?.name ?? "待确认"}</b></div>
+                  <p><b>为什么入选：</b>{theme.signal}</p>
+                  <p><b>下一步：</b>{theme.action}；{theme.risk}</p>
                 </div>
               </details>
             ))}
@@ -488,7 +503,7 @@ export default function Home() {
                 <article key={stock}>
                   <div><span className={`phase-pill ${theme ? phaseClass[theme.phase] : "watch"}`}>{theme?.phase ?? "观察"}</span><small>{theme ? `${rank === 0 ? "龙一" : "龙二"}候选` : "未进入前列"}</small></div>
                   <h3>{stock}</h3>
-                  <p>{theme ? `${theme.name} · 综合评分 ${theme.overall}` : "当前未出现在主线板块龙一、龙二名单中。"}</p>
+                  <p>{theme ? `${theme.name} · 共振评分 ${theme.score}` : "当前未出现在主线板块龙一、龙二名单中。"}</p>
                   <dl>
                     <div><dt>所属方向</dt><dd>{theme?.name ?? "等待识别"}</dd></div>
                     <div><dt>阶段</dt><dd>{theme?.phase ?? "观察"}</dd></div>
@@ -502,11 +517,12 @@ export default function Home() {
       </section>
 
       <section className="method-strip">
-        <div><span>01</span><b>资金流入</b></div>
-        <div><span>02</span><b>上涨扩散</b></div>
-        <div><span>03</span><b>持续强度</b></div>
-        <div><span>04</span><b>龙头梯队</b></div>
-        <p>{data?.method}</p>
+        <div><span>01 · 30%</span><b>资金</b></div>
+        <div><span>02 · 25%</span><b>强度</b></div>
+        <div><span>03 · 20%</span><b>扩散</b></div>
+        <div><span>04 · 15%</span><b>持续</b></div>
+        <div><span>05 · 10%</span><b>龙头</b></div>
+        <p>{data?.methodology.rule}</p>
       </section>
 
       <footer>

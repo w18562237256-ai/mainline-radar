@@ -2,20 +2,24 @@ import { mkdir, writeFile } from "node:fs/promises";
 
 const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 const scale = (value, low, high) => clamp(((value - low) / (high - low)) * 100);
-const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+const NON_THEME_BOARD = /昨日|首板|连板|涨停|打板|新高|新低|触板|炸板|破净|融资融券|沪股通|深股通|标普|MSCI|富时罗素|机构重仓|基金重仓|社保重仓|QFII/;
 
 async function fetchFirst(urls) {
   let lastError;
   for (const url of urls) {
     try {
       const response = await fetch(url, {
-        headers: { Referer: "https://quote.eastmoney.com/", "User-Agent": "Mozilla/5.0 MainlineRadarBot/2.0" },
-        signal: AbortSignal.timeout(18000),
+        headers: {
+          Referer: "https://quote.eastmoney.com/",
+          "User-Agent": "Mozilla/5.0 MainlineRadar/5.0",
+        },
+        signal: AbortSignal.timeout(15_000),
       });
       if (!response.ok) throw new Error(`${response.status} ${url}`);
-      const json = JSON.parse(await response.text());
-      if (!json?.data) throw new Error(`empty ${url}`);
-      return json;
+      const payload = await response.json();
+      if (!payload?.data) throw new Error(`empty ${url}`);
+      return payload;
     } catch (error) {
       lastError = error;
     }
@@ -41,27 +45,21 @@ async function mapLimit(items, limit, mapper) {
 }
 
 async function getBoardGroup(type, boardType) {
-  const fields = "f12,f14,f3,f24,f62,f104,f105,f109,f128,f184";
+  const fields = "f12,f14,f3,f24,f62,f104,f105,f109,f128,f136,f184";
   const hosts = ["17.push2.eastmoney.com", "79.push2.eastmoney.com", "29.push2.eastmoney.com", "7.push2.eastmoney.com", "82.push2.eastmoney.com", "push2.eastmoney.com"];
   const rows = [];
   for (let page = 1; page <= 8; page += 1) {
     const params = new URLSearchParams({
-      pn: String(page),
-      pz: "100",
-      po: "1",
-      np: "1",
+      pn: String(page), pz: "100", po: "1", np: "1",
       ut: "bd1d9ddb04089700cf9c27f6f7426281",
-      fltt: "2",
-      invt: "2",
-      fid: "f3",
-      fs: `m:90 t:${type} f:!50`,
-      fields,
+      fltt: "2", invt: "2", fid: "f3",
+      fs: `m:90 t:${type} f:!50`, fields,
     });
-    const query = params.toString();
-    const json = await fetchFirst(hosts.map((host) => `https://${host}/api/qt/clist/get?${query}`));
-    const pageRows = json.data.diff ?? [];
+    const payload = await fetchFirst(hosts.map((host) => `https://${host}/api/qt/clist/get?${params}`));
+    const pageRows = payload.data.diff ?? [];
     rows.push(...pageRows);
     if (pageRows.length < 100) break;
+    await wait(180);
   }
   return rows.map((quote) => ({ ...quote, boardType }));
 }
@@ -73,44 +71,41 @@ async function getAllBoards() {
   ]);
   const boards = groups.flatMap((group) => group.status === "fulfilled" ? group.value : []);
   const unique = new Map();
-  for (const board of boards) if (board.f12 && board.f14) unique.set(board.f12, board);
+  for (const board of boards) {
+    if (board.f12 && board.f14 && !NON_THEME_BOARD.test(board.f14)) unique.set(board.f12, board);
+  }
   return [...unique.values()];
 }
 
 async function getHistory(code) {
-  const query = `secid=90.${code}&klt=101&fqt=1&lmt=30&end=20500101&fields1=f1%2Cf2%2Cf3&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61`;
-  const json = await fetchFirst([
-    `https://push2his.eastmoney.com/api/qt/stock/kline/get?${query}`,
-    `http://push2his.eastmoney.com/api/qt/stock/kline/get?${query}`,
+  const params = new URLSearchParams({
+    secid: `90.${code}`, klt: "101", fqt: "1", lmt: "30", end: "20500101",
+    fields1: "f1,f2,f3", fields2: "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+  });
+  const payload = await fetchFirst([
+    `https://push2his.eastmoney.com/api/qt/stock/kline/get?${params}`,
+    `http://push2his.eastmoney.com/api/qt/stock/kline/get?${params}`,
   ]);
-  return (json.data.klines ?? []).map((line) => {
+  return (payload.data.klines ?? []).map((line) => {
     const [date, , close, , , , amount, , pct] = line.split(",");
     return { date, close: Number(close), amount: Number(amount), pct: Number(pct) };
   }).filter((row) => row.date && Number.isFinite(row.close));
 }
 
 async function getLeaders(code) {
-  await delay(700);
   const params = new URLSearchParams({
-    pn: "1",
-    pz: "100",
-    po: "1",
-    np: "1",
+    pn: "1", pz: "100", po: "1", np: "1",
     ut: "bd1d9ddb04089700cf9c27f6f7426281",
-    fltt: "2",
-    invt: "2",
-    fid: "f3",
-    fs: `b:${code} f:!50`,
-    fields: "f14,f3,f6,f109",
+    fltt: "2", invt: "2", fid: "f3",
+    fs: `b:${code} f:!50`, fields: "f14,f3,f6,f109",
   });
-  const query = params.toString();
-  const json = await fetchFirst([
-    `https://29.push2.eastmoney.com/api/qt/clist/get?${query}`,
-    `https://7.push2.eastmoney.com/api/qt/clist/get?${query}`,
-    `https://82.push2.eastmoney.com/api/qt/clist/get?${query}`,
-    `https://push2.eastmoney.com/api/qt/clist/get?${query}`,
+  const payload = await fetchFirst([
+    `https://29.push2.eastmoney.com/api/qt/clist/get?${params}`,
+    `https://17.push2.eastmoney.com/api/qt/clist/get?${params}`,
+    `https://79.push2.eastmoney.com/api/qt/clist/get?${params}`,
+    `https://push2.eastmoney.com/api/qt/clist/get?${params}`,
   ]);
-  const stocks = (json.data.diff ?? []).filter((stock) => stock.f14 && !stock.f14.includes("退"));
+  const stocks = (payload.data.diff ?? []).filter((stock) => stock.f14 && !stock.f14.includes("退"));
   const maxAmount = Math.max(...stocks.map((stock) => Number(stock.f6 ?? 0)), 1);
   return stocks.map((stock) => ({
     name: stock.f14,
@@ -127,151 +122,203 @@ function periodReturn(history, sessions) {
   return latest && base ? ((latest / base) - 1) * 100 : 0;
 }
 
-function strength(score) {
-  return score >= 70 ? "较强" : score >= 58 ? "观察" : "偏弱";
+function percentile(value, values) {
+  if (!values.length) return 0;
+  return values.filter((item) => item <= value).length / values.length * 100;
 }
-
-const NON_THEME_BOARD = /昨日|首板|连板|涨停|打板|新高|新低|触板|炸板|破净|融资融券|沪股通|深股通|标普|MSCI|富时罗素|机构重仓|基金重仓|社保重仓|QFII/;
 
 function themeGroup(rawName) {
   const name = rawName.replace(/[ⅡⅢ]+$/, "");
-  if (/地面兵装|航空装备|航天装备|军工电子/.test(name)) return "军工装备";
+  if (/地面兵装|航空装备|航天装备|军工电子/.test(name)) return "军工·装备";
   if (/黄金|白银|贵金属/.test(name)) return "贵金属";
   if (/油田服务|油服工程|油气及炼化工程/.test(name)) return "油气服务";
-  if (/半导体设备|集成电路封测|中芯概念|高带宽内存/.test(name)) return "半导体产业链";
+  if (/半导体设备|集成电路封测|中芯概念|高带宽内存/.test(name)) return "半导体设备";
   return name;
 }
 
-function calculateScores({ day, fiveDay, twentyDay, breadth, netIn }) {
-  let dayScore = scale(day, -2, 7) * .4 + breadth * 25
-    + scale(netIn, -10, 30) * .2 + scale(fiveDay, -5, 15) * .15;
-  let currentScore = scale(fiveDay, -5, 18) * .4 + scale(day, -3, 5) * .15
-    + breadth * 20 + scale(netIn, -15, 30) * .15 + scale(twentyDay, -10, 30) * .1;
-  let midScore = scale(twentyDay, -10, 35) * .4 + scale(fiveDay, -5, 18) * .25
-    + breadth * 15 + scale(netIn, -15, 30) * .1 + scale(day, -3, 5) * .1;
-  if (day < -2 || breadth < .25) {
-    dayScore -= 12;
-    currentScore -= 10;
-    midScore -= 5;
-  }
-  if (netIn < 0) {
-    currentScore -= 5;
-    midScore -= 3;
-  }
-  return {
-    day: Math.round(clamp(dayScore)),
-    current: Math.round(clamp(currentScore)),
-    mid: Math.round(clamp(midScore)),
-  };
-}
-
 function selectCandidates(boards) {
-  const eligibleBoards = boards.filter((board) => !NON_THEME_BOARD.test(board.f14));
-  const ranked = (selector, count = 18) => [...eligibleBoards]
+  const ranked = (selector, count = 24) => [...boards]
     .filter((board) => Number.isFinite(selector(board)))
     .sort((a, b) => selector(b) - selector(a))
     .slice(0, count);
-  const breadth = (board) => {
-    const up = Number(board.f104 ?? 0);
-    const down = Number(board.f105 ?? 0);
-    return up + down ? up / (up + down) : .5;
-  };
-  const preliminary = (board) =>
-    scale(Number(board.f3 ?? 0), -2, 7) * .28
-    + scale(Number(board.f109 ?? 0), -5, 20) * .25
-    + scale(Number(board.f24 ?? 0), -10, 45) * .19
-    + breadth(board) * 16
-    + scale(Number(board.f184 ?? 0), -8, 12) * .12;
-
   const union = new Map();
   [
     ...ranked((board) => Number(board.f3 ?? -99)),
-    ...ranked((board) => Number(board.f109 ?? -99)),
-    ...ranked((board) => Number(board.f24 ?? -99)),
     ...ranked((board) => Number(board.f62 ?? -Infinity)),
-    ...ranked(preliminary, 28),
+    ...ranked((board) => Number(board.f184 ?? -99)),
+    ...ranked((board) => Number(board.f136 ?? -99)),
+    ...ranked((board) => Number(board.f109 ?? -99)),
   ].forEach((board) => union.set(board.f12, board));
-  return [...union.values()].sort((a, b) => preliminary(b) - preliminary(a)).slice(0, 60);
+  return [...union.values()].slice(0, 90);
 }
 
-function genericInsight(board) {
-  return {
-    catalyst: `${board.boardType}近期涨幅、扩散度和资金强度共同进入全市场前列`,
-    risk: "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
-  };
+function phaseFor(theme) {
+  if (
+    theme.change <= -1.2
+    || theme.breadth < .3
+    || (theme.components.capital < 30 && theme.netIn < 0)
+  ) return "退潮";
+  if (
+    theme.score >= 72
+    && theme.change >= 1.8
+    && theme.trend.fiveDay >= 5
+    && theme.leaderChange >= 6
+  ) return "加速";
+  if (
+    theme.score >= 62
+    && theme.components.capital >= 50
+    && theme.breadth >= .5
+    && theme.change >= .5
+  ) return "启动";
+  return "观察";
+}
+
+function actionFor(phase) {
+  if (phase === "加速") return "强度已高，不盲目追涨，等分歧后的承接";
+  if (phase === "启动") return "加入重点观察，确认下一次刷新仍有资金承接";
+  if (phase === "退潮") return "降低关注，等待资金和上涨家数重新恢复";
+  return "暂不下结论，等待资金、扩散和龙头形成共振";
 }
 
 const allBoards = await getAllBoards();
 if (!allBoards.length) throw new Error("No A-share boards returned");
 const candidates = selectCandidates(allBoards);
-const historyResults = await mapLimit(candidates, 6, async (quote) => {
+
+const historyResults = await mapLimit(candidates, 5, async (quote) => {
   const history = await getHistory(quote.f12);
   if (history.length < 5) throw new Error(`history missing ${quote.f14}`);
   const up = Number(quote.f104 ?? 0);
   const down = Number(quote.f105 ?? 0);
-  const breadth = up + down ? up / (up + down) : .5;
-  const day = Number(quote.f3 ?? 0);
-  const fiveDay = periodReturn(history, 5);
-  const twentyDay = periodReturn(history, 20);
-  const netIn = Number(quote.f62 ?? 0) / 100_000_000;
   return {
-    id: String(quote.f12), name: quote.f14, matchedBoard: quote.f14, boardType: quote.boardType,
-    scores: calculateScores({ day, fiveDay, twentyDay, breadth, netIn }),
-    returns: { day, fiveDay, twentyDay }, breadth,
-    netIn,
-    leaders: [], ...genericInsight(quote), sessionDate: history.at(-1).date,
+    id: String(quote.f12),
+    rawName: quote.f14,
+    matchedBoard: quote.f14,
+    boardType: quote.boardType,
+    sessionDate: history.at(-1).date,
+    change: Number(quote.f3 ?? 0),
+    netIn: Number(quote.f62 ?? 0) / 100_000_000,
+    mainNetRatio: Number(quote.f184 ?? 0),
+    breadth: up + down ? up / (up + down) : .5,
+    leaderName: quote.f128 && quote.f128 !== "-" ? quote.f128 : null,
+    leaderChange: Number(quote.f136 ?? 0),
+    trend: {
+      fiveDay: periodReturn(history, 5),
+      twentyDay: periodReturn(history, 20),
+      positiveDays5: history.slice(-5).filter((row) => row.pct > 0).length,
+    },
   };
 });
 
-const analyzed = historyResults.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
-if (!analyzed.length) throw new Error("No candidate history resolved");
-const deduped = [...analyzed.reduce((groups, theme) => {
-  const group = themeGroup(theme.name);
-  const previous = groups.get(group);
-  const total = Object.values(theme.scores).reduce((sum, value) => sum + value, 0);
-  const previousTotal = previous ? Object.values(previous.scores).reduce((sum, value) => sum + value, 0) : -1;
-  if (total > previousTotal) groups.set(group, { ...theme, name: group });
-  return groups;
-}, new Map()).values()];
-const topBy = (period, count = 15) => [...deduped].sort((a, b) => b.scores[period] - a.scores[period]).slice(0, count);
-const finalistsMap = new Map();
-[...topBy("day"), ...topBy("current"), ...topBy("mid")].forEach((theme) => finalistsMap.set(theme.id, theme));
-const finalists = [...finalistsMap.values()];
+const resolved = historyResults.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
+if (!resolved.length) throw new Error("No candidate history resolved");
+const netValues = resolved.map((theme) => theme.netIn);
 
-const boardById = new Map(allBoards.map((board) => [board.f12, board]));
-await delay(15_000);
+const scored = resolved.map((theme) => {
+  const components = {
+    capital: Math.round(
+      percentile(theme.netIn, netValues) * .6 + scale(theme.mainNetRatio, -8, 12) * .4,
+    ),
+    strength: Math.round(
+      scale(theme.change, -2, 6) * .6 + scale(theme.trend.fiveDay, -4, 15) * .4,
+    ),
+    breadth: Math.round(theme.breadth * 100),
+    continuity: Math.round(
+      scale(theme.trend.fiveDay, -4, 15) * .5
+      + (theme.trend.positiveDays5 / 5) * 30
+      + scale(theme.trend.twentyDay, -10, 30) * .2,
+    ),
+    leadership: Math.round(
+      (theme.leaderName ? 30 : 0) + scale(theme.leaderChange, -2, 10) * .7,
+    ),
+  };
+  const score = Math.round(
+    components.capital * .3
+    + components.strength * .25
+    + components.breadth * .2
+    + components.continuity * .15
+    + components.leadership * .1,
+  );
+  const base = { ...theme, name: themeGroup(theme.rawName), components, score };
+  const phase = phaseFor(base);
+  const confirmed = score >= 65 && phase !== "退潮" && components.capital >= 45 && components.breadth >= 40;
+  return {
+    ...base,
+    phase,
+    confirmed,
+    leaders: theme.leaderName ? [{ rank: "龙一", name: theme.leaderName }] : [],
+    signal: `资金分${components.capital}、强度分${components.strength}、扩散分${components.breadth}、持续分${components.continuity}、龙头分${components.leadership}`,
+    action: actionFor(phase),
+    risk: "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+  };
+});
+
+const deduped = [...scored.reduce((groups, theme) => {
+  const previous = groups.get(theme.name);
+  if (!previous || theme.score > previous.score) groups.set(theme.name, theme);
+  return groups;
+}, new Map()).values()].sort((a, b) => b.score - a.score);
+
+const finalists = deduped.slice(0, 30);
+await wait(8_000);
 const leaderResults = await mapLimit(finalists, 2, async (theme) => {
   try {
-    return { id: theme.id, leaders: await getLeaders(theme.id) };
+    const leaders = await getLeaders(theme.id);
+    return { id: theme.id, leaders: leaders.length ? leaders : theme.leaders };
   } catch {
-    const fallbackName = boardById.get(theme.id)?.f128;
-    return {
-      id: theme.id,
-      leaders: fallbackName && fallbackName !== "-"
-        ? [{ rank: "龙一", name: fallbackName }]
-        : [],
-    };
+    return { id: theme.id, leaders: theme.leaders };
   }
 });
-const leadersById = new Map(leaderResults.flatMap((result) => result.status === "fulfilled" ? [[result.value.id, result.value.leaders]] : []));
-const themes = finalists.map((theme) => ({ ...theme, leaders: leadersById.get(theme.id) ?? [] }));
-const pick = (period) => [...themes].sort((a, b) => b.scores[period] - a.scores[period])[0];
-const top = { day: pick("day"), current: pick("current"), mid: pick("mid") };
+const leadersById = new Map(leaderResults.flatMap((result) =>
+  result.status === "fulfilled" ? [[result.value.id, result.value.leaders]] : [],
+));
+const themes = finalists.map((theme) => ({ ...theme, leaders: leadersById.get(theme.id) ?? theme.leaders }));
+const topFive = themes.slice(0, 5);
+const temperature = Math.round(topFive.reduce((sum, theme) => sum + theme.score, 0) / Math.max(topFive.length, 1));
+const mainlineCount = themes.filter((theme) => theme.confirmed).length;
+const conclusion = mainlineCount >= 3
+  ? "主线清晰 · 资金聚焦"
+  : mainlineCount >= 1
+    ? "弱市聚焦 · 主线待扩散"
+    : "快速轮动 · 暂无确认主线";
 
 const payload = {
+  schemaVersion: 2,
   available: true,
-  sourceLabel: "GitHub全市场自动扫描",
+  sourceLabel: "东方财富全市场快照",
   sessionDate: themes.map((theme) => theme.sessionDate).sort().at(-1),
-  updatedAt: new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit" }).format(new Date()),
-  coverage: { totalBoards: allBoards.length, deepAnalyzed: analyzed.length, displayed: themes.length },
-  leaders: Object.fromEntries(Object.entries(top).map(([period, theme]) => [period, {
-    id: theme.id, name: theme.name, score: theme.scores[period], strength: strength(theme.scores[period]),
-  }])),
-  themes: themes.sort((a, b) => b.scores.current - a.scores.current),
-  method: `已快速扫描${allBoards.length}个A股行业与概念板块；对涨幅、资金或阶段强度靠前的${analyzed.length}个候选进行历史深算，再分别生成1日、5日和20日榜单。`,
+  updatedAt: new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit",
+  }).format(new Date()),
+  coverage: {
+    totalBoards: allBoards.length,
+    deepAnalyzed: resolved.length,
+    displayed: themes.length,
+  },
+  market: {
+    temperature,
+    mainlineCount,
+    conclusion,
+    strongestThemeId: themes[0]?.id ?? null,
+    nextThemeId: themes.find((theme, index) => index > 0 && theme.phase === "启动")?.id ?? themes[1]?.id ?? null,
+  },
+  themes,
+  methodology: {
+    name: "主线共振模型 V2",
+    weights: { capital: 30, strength: 25, breadth: 20, continuity: 15, leadership: 10 },
+    rule: "资金、强度、上涨扩散、持续性和龙头梯队五项共振；任一项明显退化都会降低阶段或取消主线确认。",
+  },
 };
 
-await Promise.all([mkdir("public", { recursive: true }), mkdir("docs", { recursive: true })]);
-const output = JSON.stringify(payload, null, 2) + "\n";
-await Promise.all([writeFile("public/market-data.json", output), writeFile("docs/market-data.json", output)]);
-console.log(`Updated ${payload.sessionDate}: ${allBoards.length} scanned, ${analyzed.length} analyzed, ${themes.length} displayed`);
+await mkdir("public", { recursive: true });
+await mkdir("docs", { recursive: true });
+const output = `${JSON.stringify(payload, null, 2)}\n`;
+await writeFile("public/market-data.json", output, "utf8");
+await writeFile("docs/market-data.json", output, "utf8");
+console.log(JSON.stringify({
+  sessionDate: payload.sessionDate,
+  totalBoards: payload.coverage.totalBoards,
+  analyzed: payload.coverage.deepAnalyzed,
+  displayed: payload.coverage.displayed,
+  conclusion,
+  top: themes.slice(0, 5).map((theme) => `${theme.name}:${theme.score}:${theme.phase}`),
+}, null, 2));
