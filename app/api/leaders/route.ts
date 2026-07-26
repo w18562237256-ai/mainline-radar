@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     });
     if (!response.ok) throw new Error(`sector page ${response.status}`);
     const html = await response.text();
-    const pattern = /quote\.eastmoney\.com\/(?:sh|sz|bj)(\d{6})\.html[^>]*>\1<\/a>\s*<a[^>]*>([^<]+)<\/a>\s*<span data-percent[^>]*>([-+]?\d+(?:\.\d+)?)%<\/span>/g;
+    const pattern = /quote\.eastmoney\.com\/(?:sh|sz|bj)(\d{6})\.html[^"]*"[^>]*>\1<\/a>\s*<a[^>]*>([^<]+)<\/a>\s*<span data-percent[^>]*>\s*([-+]?\d+(?:\.\d+)?)%<\/span>/g;
     const seen = new Set<string>();
     const leaders: Leader[] = [];
 

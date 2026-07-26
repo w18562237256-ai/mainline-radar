@@ -34,7 +34,7 @@ export async function GET() {
       },
       themes: [],
       methodology: {
-        name: "主线共振模型 V2",
+        name: "主线归因模型 V3",
         weights: { capital: 30, strength: 25, breadth: 20, continuity: 15, leadership: 10 },
         rule: "数据不足时不输出主线结论。",
       },

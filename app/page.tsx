@@ -29,6 +29,10 @@ type Theme = {
   action: string;
   risk: string;
   sessionDate: string;
+  displayType?: "主线题材" | "行业板块" | "防御方向";
+  driver?: string;
+  attribution?: string;
+  leaderMode?: "dragon" | "gainers" | "single";
 };
 type Payload = {
   schemaVersion: 2;
@@ -170,7 +174,7 @@ function emptyPayload(): Payload {
     },
     themes: [],
     methodology: {
-      name: "主线共振模型 V2",
+      name: "主线归因模型 V3",
       weights: { capital: 30, strength: 25, breadth: 20, continuity: 15, leadership: 10 },
       rule: "数据不足时不输出主线结论。",
     },
@@ -189,7 +193,9 @@ export default function Home() {
 
   const fillLeaders = useCallback(async (payload: Payload) => {
     if (enriching.current || !payload.available) return;
-    const targets = payload.themes.filter((theme) => theme.leaders.length < 2).slice(0, 10);
+    const targets = payload.themes
+      .filter((theme) => theme.leaderMode === "dragon" && theme.leaders.length < 2)
+      .slice(0, 10);
     if (!targets.length) return;
     enriching.current = true;
     for (const theme of targets) {
@@ -248,6 +254,8 @@ export default function Home() {
     (["加速", "启动", "观察", "退潮"] as Phase[])
       .map((phase) => [phase, ranked.filter((theme) => theme.phase === phase).length]),
   ) as Record<Phase, number>;
+  const leaderTitle = (theme: Theme, index: number) =>
+    theme.leaderMode === "dragon" ? (index ? "龙二" : "龙一") : (index ? "领涨二" : "领涨一");
 
   return (
     <main id="top">
@@ -288,8 +296,8 @@ export default function Home() {
             <p className="plain-conclusion">{data?.market.conclusion ?? "数据不足，暂不判断"}</p>
 
             <div className="leader-line">
-              <div><span>龙一</span><b>{strongest?.leaders[0]?.name ?? "待确认"}</b><em>{strongest?.leaders[0]?.change != null ? signed(strongest.leaders[0].change) : strongest ? signed(strongest.leaderChange) : ""}</em></div>
-              <div><span>龙二</span><b>{strongest?.leaders[1]?.name ?? "暂无已核验"}</b><em>{strongest?.leaders[1]?.change != null ? signed(strongest.leaders[1].change) : ""}</em></div>
+              <div><span>{strongest ? leaderTitle(strongest, 0) : "龙一"}</span><b>{strongest?.leaders[0]?.name ?? "暂无"}</b><em>{strongest?.leaders[0]?.change != null ? signed(strongest.leaders[0].change) : strongest ? signed(strongest.leaderChange) : ""}</em></div>
+              <div><span>{strongest ? leaderTitle(strongest, 1) : "龙二"}</span><b>{strongest?.leaders[1]?.name ?? "未形成梯队"}</b><em>{strongest?.leaders[1]?.change != null ? signed(strongest.leaders[1].change) : ""}</em></div>
             </div>
 
             <div className="today-metrics">
@@ -346,8 +354,8 @@ export default function Home() {
                   <span className="sector-name">
                     <b>{theme.name}</b>
                     <small>
-                      龙一 {theme.leaders[0]?.name ?? "待确认"} {theme.leaders[0]?.change != null ? signed(theme.leaders[0].change) : ""}
-                      {" · "}龙二 {theme.leaders[1]?.name ?? "暂无已核验"} {theme.leaders[1]?.change != null ? signed(theme.leaders[1].change) : ""}
+                      {leaderTitle(theme, 0)} {theme.leaders[0]?.name ?? "暂无"} {theme.leaders[0]?.change != null ? signed(theme.leaders[0].change) : ""}
+                      {" · "}{leaderTitle(theme, 1)} {theme.leaders[1]?.name ?? "未形成梯队"} {theme.leaders[1]?.change != null ? signed(theme.leaders[1].change) : ""}
                     </small>
                   </span>
                   <i className={`phase-badge ${phaseClass[theme.phase]}`}>{theme.phase}</i>
@@ -371,6 +379,8 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
+                  {theme.driver && <p><b>当天为什么动：</b>{theme.driver}</p>}
+                  {theme.attribution && <p><b>归属校正：</b>{theme.attribution}</p>}
                   <p><b>入选原因：</b>{theme.signal}</p>
                   <p><b>下一步：</b>{theme.action}</p>
                   <p><b>风险：</b>{theme.risk}</p>
@@ -410,8 +420,10 @@ export default function Home() {
               return (
                 <article key={stock}>
                   <div><h3>{stock}</h3><i className={`phase-badge ${theme ? phaseClass[theme.phase] : "watch"}`}>{theme?.phase ?? "观察"}</i></div>
-                  <p>{theme ? `${theme.name} · ${leaderIndex === 0 ? "龙一" : "龙二"} · ${theme.score}分` : "尚未进入主线龙一、龙二名单"}</p>
-                  <b>{theme?.action ?? "继续观察，不提前下结论"}</b>
+                  <p>{theme ? `${theme.name} · ${leaderTitle(theme, leaderIndex)} · ${theme.score}分` : "尚未进入主线龙一、龙二名单"}</p>
+                  <b>{stock === "孚日股份"
+                    ? "行业归属是棉纺，主营是家纺+新材料；本次上涨逻辑是VC添加剂涨价，不是棉纺主线"
+                    : theme?.action ?? "继续观察，不提前下结论"}</b>
                 </article>
               );
             })}

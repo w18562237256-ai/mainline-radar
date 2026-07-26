@@ -12,7 +12,7 @@ async function fetchPublicBoardLeaders(code) {
   });
   if (!response.ok) throw new Error(`sector fallback ${response.status}`);
   const html = await response.text();
-  const pattern = /quote\.eastmoney\.com\/(?:sh|sz|bj)(\d{6})\.html[^>]*>\1<\/a>\s*<a[^>]*>([^<]+)<\/a>\s*<span data-percent[^>]*>([-+]?\d+(?:\.\d+)?)%<\/span>/g;
+  const pattern = /quote\.eastmoney\.com\/(?:sh|sz|bj)(\d{6})\.html[^"]*"[^>]*>\1<\/a>\s*<a[^>]*>([^<]+)<\/a>\s*<span data-percent[^>]*>\s*([-+]?\d+(?:\.\d+)?)%<\/span>/g;
   const leaders = [];
   const seen = new Set();
   for (const match of html.matchAll(pattern)) {

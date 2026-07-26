@@ -327,6 +327,10 @@ const themes = finalists.map((theme) => {
   const result = { ...base, phase, confirmed };
   return {
     ...result,
+    displayType: confirmed ? "主线题材" : "行业板块",
+    driver: "行情源只提供行业归属，需再与当天催化交叉核验",
+    attribution: "未完成题材归因前，只能视为行业板块表现",
+    leaderMode: confirmed && (phase === "启动" || phase === "加速") ? "dragon" : "gainers",
     signal: signalFor(result),
     action: actionFor(phase),
     risk: phase === "加速"
@@ -365,9 +369,9 @@ const payload = {
   },
   themes,
   methodology: {
-    name: "主线共振模型 V2",
+    name: "主线归因模型 V3",
     weights: { capital: 30, strength: 25, breadth: 20, continuity: 15, leadership: 10 },
-    rule: "资金、强度、上涨扩散、持续性和龙头梯队五项共振；任一项明显退化都会降低阶段或取消主线确认。",
+    rule: "先区分静态行业归属与当天上涨题材，再用资金、强度、上涨扩散、持续性和龙头梯队五项共振判断阶段；观察和退潮板块只标领涨股。",
   },
 };
 
