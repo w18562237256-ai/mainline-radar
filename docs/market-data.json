@@ -1,0 +1,694 @@
+{
+  "available": true,
+  "sourceLabel": "GitHub全市场自动扫描",
+  "sessionDate": "2026-07-24",
+  "updatedAt": "14:24",
+  "coverage": {
+    "totalBoards": 496,
+    "deepAnalyzed": 55,
+    "displayed": 30
+  },
+  "leaders": {
+    "day": {
+      "id": "BK1382",
+      "name": "地面兵装Ⅲ",
+      "score": 53,
+      "strength": "偏弱"
+    },
+    "current": {
+      "id": "BK1382",
+      "name": "地面兵装Ⅲ",
+      "score": 65,
+      "strength": "观察"
+    },
+    "mid": {
+      "id": "BK1573",
+      "name": "油田服务",
+      "score": 52,
+      "strength": "偏弱"
+    }
+  },
+  "themes": [
+    {
+      "id": "BK1382",
+      "name": "地面兵装Ⅲ",
+      "matchedBoard": "地面兵装Ⅲ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 53,
+        "current": 65,
+        "mid": 33
+      },
+      "returns": {
+        "day": 2.1,
+        "fiveDay": 10.107717132358541,
+        "twentyDay": -4.132252862488062
+      },
+      "breadth": 0.5,
+      "netIn": 3.82371552,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1616",
+      "name": "白银",
+      "matchedBoard": "白银",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 5,
+        "current": 58,
+        "mid": 37
+      },
+      "returns": {
+        "day": -4.69,
+        "fiveDay": 15.534701436041964,
+        "twentyDay": 0.33656496386540447
+      },
+      "breadth": 0,
+      "netIn": -2.44987792,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1434",
+      "name": "钾肥",
+      "matchedBoard": "钾肥",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 0,
+        "current": 54,
+        "mid": 46
+      },
+      "returns": {
+        "day": -4.86,
+        "fiveDay": 12.470382542897518,
+        "twentyDay": 7.046857807967544
+      },
+      "breadth": 0,
+      "netIn": -5.1020376,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK0732",
+      "name": "贵金属",
+      "matchedBoard": "贵金属",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 1,
+        "current": 52,
+        "mid": 45
+      },
+      "returns": {
+        "day": -5.7,
+        "fiveDay": 11.180083638264504,
+        "twentyDay": 6.64312836556793
+      },
+      "breadth": 0,
+      "netIn": -14.64282288,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1617",
+      "name": "黄金",
+      "matchedBoard": "黄金",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 0,
+        "current": 49,
+        "mid": 46
+      },
+      "returns": {
+        "day": -6.01,
+        "fiveDay": 9.864686751461882,
+        "twentyDay": 8.393991609833073
+      },
+      "breadth": 0,
+      "netIn": -12.1929456,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1521",
+      "name": "摩托车",
+      "matchedBoard": "摩托车",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 41,
+        "current": 47,
+        "mid": 48
+      },
+      "returns": {
+        "day": 1.11,
+        "fiveDay": 3.0428306998296017,
+        "twentyDay": 8.622277069394958
+      },
+      "breadth": 0.4444444444444444,
+      "netIn": 0.36068233,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1572",
+      "name": "油气及炼化工程",
+      "matchedBoard": "油气及炼化工程",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 5,
+        "current": 45,
+        "mid": 47
+      },
+      "returns": {
+        "day": -3.88,
+        "fiveDay": 9.6229895513525,
+        "twentyDay": 11.84940733626818
+      },
+      "breadth": 0,
+      "netIn": -1.98514,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1573",
+      "name": "油田服务",
+      "matchedBoard": "油田服务",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 16,
+        "current": 44,
+        "mid": 52
+      },
+      "returns": {
+        "day": -2.78,
+        "fiveDay": 7.480107498550881,
+        "twentyDay": 15.050836941040435
+      },
+      "breadth": 0.125,
+      "netIn": 0.70675152,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1275",
+      "name": "油服工程",
+      "matchedBoard": "油服工程",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 10,
+        "current": 44,
+        "mid": 50
+      },
+      "returns": {
+        "day": -3.25,
+        "fiveDay": 8.406839105655406,
+        "twentyDay": 13.731249923343913
+      },
+      "breadth": 0.07142857142857142,
+      "netIn": -1.27838848,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1587",
+      "name": "电信运营商",
+      "matchedBoard": "电信运营商",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 48,
+        "current": 43,
+        "mid": 50
+      },
+      "returns": {
+        "day": 0.75,
+        "fiveDay": 2.5499487574961233,
+        "twentyDay": 11.340751349564826
+      },
+      "breadth": 1,
+      "netIn": -1.1750664,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1610",
+      "name": "股份制银行Ⅲ",
+      "matchedBoard": "股份制银行Ⅲ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 31,
+        "current": 42,
+        "mid": 46
+      },
+      "returns": {
+        "day": 0.1,
+        "fiveDay": 2.275194795568214,
+        "twentyDay": 7.778232161482879
+      },
+      "breadth": 0.5555555555555556,
+      "netIn": -4.84693136,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1412",
+      "name": "氨纶",
+      "matchedBoard": "氨纶",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 4,
+        "current": 41,
+        "mid": 37
+      },
+      "returns": {
+        "day": -6.02,
+        "fiveDay": 5.4616410572089436,
+        "twentyDay": 1.9193074781680197
+      },
+      "breadth": 0,
+      "netIn": -0.21382805,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1318",
+      "name": "光伏主材",
+      "matchedBoard": "光伏主材",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 0,
+        "current": 41,
+        "mid": 28
+      },
+      "returns": {
+        "day": -3.47,
+        "fiveDay": 6.020021190003688,
+        "twentyDay": -4.399188308764912
+      },
+      "breadth": 0,
+      "netIn": -2.0779069,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1383",
+      "name": "航海装备Ⅲ",
+      "matchedBoard": "航海装备Ⅲ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 25,
+        "current": 40,
+        "mid": 28
+      },
+      "returns": {
+        "day": -0.13,
+        "fiveDay": 4.25751638113363,
+        "twentyDay": -1.9579571429177323
+      },
+      "breadth": 0.3333333333333333,
+      "netIn": -2.27754992,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1230",
+      "name": "航海装备Ⅱ",
+      "matchedBoard": "航海装备Ⅱ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 25,
+        "current": 40,
+        "mid": 28
+      },
+      "returns": {
+        "day": -0.13,
+        "fiveDay": 4.25751638113363,
+        "twentyDay": -1.9579571429177323
+      },
+      "breadth": 0.3333333333333333,
+      "netIn": -2.27754992,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1419",
+      "name": "煤化工",
+      "matchedBoard": "煤化工",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 6,
+        "current": 38,
+        "mid": 49
+      },
+      "returns": {
+        "day": -2.25,
+        "fiveDay": 5.882528805735432,
+        "twentyDay": 12.945281057257496
+      },
+      "breadth": 0.1,
+      "netIn": -3.45833728,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1503",
+      "name": "果蔬加工",
+      "matchedBoard": "果蔬加工",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 41,
+        "current": 34,
+        "mid": 27
+      },
+      "returns": {
+        "day": 0.15,
+        "fiveDay": -0.849671487843362,
+        "twentyDay": -2.2343932472984718
+      },
+      "breadth": 0.4,
+      "netIn": 0.4353139,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1349",
+      "name": "棉纺",
+      "matchedBoard": "棉纺",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 44,
+        "current": 33,
+        "mid": 38
+      },
+      "returns": {
+        "day": 0.14,
+        "fiveDay": 0.34218951394953123,
+        "twentyDay": 5.176614150922831
+      },
+      "breadth": 0.3333333333333333,
+      "netIn": 1.6819904,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1532",
+      "name": "金属包装",
+      "matchedBoard": "金属包装",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 39,
+        "current": 32,
+        "mid": 17
+      },
+      "returns": {
+        "day": 0.43,
+        "fiveDay": -1.3667221819756992,
+        "twentyDay": -11.071682282951588
+      },
+      "breadth": 0.2857142857142857,
+      "netIn": 0.55637597,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1358",
+      "name": "保险Ⅲ",
+      "matchedBoard": "保险Ⅲ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 0,
+        "current": 32,
+        "mid": 46
+      },
+      "returns": {
+        "day": -2.47,
+        "fiveDay": 4.076860589588449,
+        "twentyDay": 12.362506761962532
+      },
+      "breadth": 0,
+      "netIn": -12.14887664,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK0474",
+      "name": "保险Ⅱ",
+      "matchedBoard": "保险Ⅱ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 0,
+        "current": 32,
+        "mid": 46
+      },
+      "returns": {
+        "day": -2.47,
+        "fiveDay": 4.076860589588449,
+        "twentyDay": 12.362506761962532
+      },
+      "breadth": 0,
+      "netIn": -12.14887664,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1283",
+      "name": "银行",
+      "matchedBoard": "银行",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 21,
+        "current": 32,
+        "mid": 43
+      },
+      "returns": {
+        "day": -0.24,
+        "fiveDay": 1.1612523529039853,
+        "twentyDay": 7.0303052134847555
+      },
+      "breadth": 0.35714285714285715,
+      "netIn": -18.68831344,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK0475",
+      "name": "银行Ⅱ",
+      "matchedBoard": "银行Ⅱ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 21,
+        "current": 32,
+        "mid": 43
+      },
+      "returns": {
+        "day": -0.24,
+        "fiveDay": 1.1612523529039853,
+        "twentyDay": 7.0303052134847555
+      },
+      "breadth": 0.35714285714285715,
+      "netIn": -18.68831344,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1609",
+      "name": "城商行Ⅲ",
+      "matchedBoard": "城商行Ⅲ",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 15,
+        "current": 31,
+        "mid": 40
+      },
+      "returns": {
+        "day": -0.51,
+        "fiveDay": 1.2084882062042945,
+        "twentyDay": 6.954040861581712
+      },
+      "breadth": 0.23529411764705882,
+      "netIn": -5.7405832,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1331",
+      "name": "数字芯片设计",
+      "matchedBoard": "数字芯片设计",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 24,
+        "current": 27,
+        "mid": 12
+      },
+      "returns": {
+        "day": -0.95,
+        "fiveDay": 0.15841566321050937,
+        "twentyDay": -23.027777524299076
+      },
+      "breadth": 0.3269230769230769,
+      "netIn": -16.3855488,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1263",
+      "name": "摩托车及其他",
+      "matchedBoard": "摩托车及其他",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 27,
+        "current": 22,
+        "mid": 28
+      },
+      "returns": {
+        "day": -0.35,
+        "fiveDay": -0.38511763127022647,
+        "twentyDay": 1.304062467413769
+      },
+      "breadth": 0.2631578947368421,
+      "netIn": 0.20396716,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1036",
+      "name": "半导体",
+      "matchedBoard": "半导体",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 33,
+        "current": 21,
+        "mid": 11
+      },
+      "returns": {
+        "day": -0.01,
+        "fiveDay": -1.6723513590672034,
+        "twentyDay": -24.909349612154042
+      },
+      "breadth": 0.4111111111111111,
+      "netIn": 33.05525504,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1348",
+      "name": "辅料",
+      "matchedBoard": "辅料",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 31,
+        "current": 19,
+        "mid": 25
+      },
+      "returns": {
+        "day": -1.25,
+        "fiveDay": -2.627425494383062,
+        "twentyDay": 0.7601202050556921
+      },
+      "breadth": 0.5,
+      "netIn": 0.15757076,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1330",
+      "name": "模拟芯片设计",
+      "matchedBoard": "模拟芯片设计",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 28,
+        "current": 17,
+        "mid": 9
+      },
+      "returns": {
+        "day": -0.09,
+        "fiveDay": -2.8094852100884915,
+        "twentyDay": -24.82922975134413
+      },
+      "breadth": 0.4117647058823529,
+      "netIn": -4.46713696,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    },
+    {
+      "id": "BK1325",
+      "name": "半导体材料",
+      "matchedBoard": "半导体材料",
+      "boardType": "行业板块",
+      "scores": {
+        "day": 32,
+        "current": 15,
+        "mid": 11
+      },
+      "returns": {
+        "day": -0.32,
+        "fiveDay": -4.707609576529503,
+        "twentyDay": -30.306918063073162
+      },
+      "breadth": 0.3870967741935484,
+      "netIn": 7.30870272,
+      "leaders": [],
+      "catalyst": "行业板块近期涨幅、扩散度和资金强度共同进入全市场前列",
+      "risk": "短期强度回落、上涨家数明显收缩，且龙头股无法完成分歧承接",
+      "sessionDate": "2026-07-24"
+    }
+  ],
+  "method": "已快速扫描496个A股行业与概念板块；对涨幅、资金或阶段强度靠前的55个候选进行历史深算，再分别生成1日、5日和20日榜单。"
+}
