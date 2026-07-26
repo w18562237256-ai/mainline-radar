@@ -21,9 +21,10 @@ test("server-renders the market mainline dashboard shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>主线雷达｜A股市场主线监测<\/title>/);
-  assert.match(html, /不再只说一个/);
-  assert.match(html, /三周期结论/);
-  assert.match(html, /板块排名/);
+  assert.match(html, /当前交易提示/);
+  assert.match(html, /主线温度/);
+  assert.match(html, /潜在龙头雷达/);
+  assert.match(html, /板块强度排行/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
 

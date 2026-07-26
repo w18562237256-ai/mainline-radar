@@ -176,7 +176,7 @@ export async function GET() {
     if (snapshot.ok) {
       const payload = await snapshot.json() as Record<string, unknown>;
       return NextResponse.json(payload, {
-        headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+        headers: { "Cache-Control": "public, s-maxage=20, stale-while-revalidate=120" },
       });
     }
   } catch {
@@ -271,7 +271,7 @@ export async function GET() {
       if (snapshot.ok) {
         const payload = await snapshot.json() as Record<string, unknown>;
         return NextResponse.json(payload, {
-          headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=600" },
+          headers: { "Cache-Control": "public, s-maxage=20, stale-while-revalidate=120" },
         });
       }
     } catch {
