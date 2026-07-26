@@ -77,8 +77,21 @@ async function getHistory(code) {
 }
 
 async function getLeaders(code) {
-  const query = `pn=1&pz=60&po=1&np=1&fltt=2&invt=2&fid=f6&fs=b%3A${code}%2Bf%3A!50&fields=f14%2Cf3%2Cf6%2Cf109`;
+  const params = new URLSearchParams({
+    pn: "1",
+    pz: "100",
+    po: "1",
+    np: "1",
+    ut: "bd1d9ddb04089700cf9c27f6f7426281",
+    fltt: "2",
+    invt: "2",
+    fid: "f3",
+    fs: `b:${code} f:!50`,
+    fields: "f14,f3,f6,f109",
+  });
+  const query = params.toString();
   const json = await fetchFirst([
+    `https://29.push2.eastmoney.com/api/qt/clist/get?${query}`,
     `https://7.push2.eastmoney.com/api/qt/clist/get?${query}`,
     `https://82.push2.eastmoney.com/api/qt/clist/get?${query}`,
     `https://push2.eastmoney.com/api/qt/clist/get?${query}`,
