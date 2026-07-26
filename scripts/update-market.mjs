@@ -41,10 +41,16 @@ async function mapLimit(items, limit, mapper) {
 
 async function getBoardGroup(type, boardType) {
   const fields = "f12,f14,f3,f24,f62,f104,f105,f109,f184";
-  const query = `pn=1&pz=500&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m%3A90%2Bt%3A${type}%2Bf%3A!50&fields=${fields}`;
   const hosts = ["7.push2.eastmoney.com", "82.push2.eastmoney.com", "56.push2.eastmoney.com", "push2.eastmoney.com"];
-  const json = await fetchFirst(hosts.map((host) => `https://${host}/api/qt/clist/get?${query}`));
-  return (json.data.diff ?? []).map((quote) => ({ ...quote, boardType }));
+  const rows = [];
+  for (let page = 1; page <= 8; page += 1) {
+    const query = `pn=${page}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m%3A90%2Bt%3A${type}%2Bf%3A!50&fields=${fields}`;
+    const json = await fetchFirst(hosts.map((host) => `https://${host}/api/qt/clist/get?${query}`));
+    const pageRows = json.data.diff ?? [];
+    rows.push(...pageRows);
+    if (pageRows.length < 100) break;
+  }
+  return rows.map((quote) => ({ ...quote, boardType }));
 }
 
 async function getAllBoards() {
