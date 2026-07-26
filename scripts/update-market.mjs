@@ -133,7 +133,7 @@ async function getLeaders(code) {
       change: stock.change,
       momentum5d: stock.momentum5d,
       amount: stock.amount,
-      membershipVerified: true,
+      constituentVerified: true,
     }));
 }
 
@@ -281,7 +281,7 @@ const scored = resolved.map((theme) => {
       rank: "龙一",
       name: theme.leaderName,
       change: theme.leaderChange,
-      membershipVerified: true,
+      constituentVerified: true,
     }] : [],
     signal: `资金分${components.capital}、强度分${components.strength}、扩散分${components.breadth}、持续分${components.continuity}、龙头分${components.leadership}`,
     action: actionFor(phase),

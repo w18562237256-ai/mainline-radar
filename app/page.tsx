@@ -22,21 +22,37 @@ type Theme = {
   breadth: number;
   netIn: number;
   leaderChange: number;
-  trend: { fiveDay: number; twentyDay: number; positiveDays5: number };
+  trend: { fiveDay: number; twentyDay: number; positiveDays5: number; valid?: boolean };
   components: Components;
-  leaders: { rank: string; name: string; code?: string; change?: number; membershipVerified?: boolean }[];
+  leaders: {
+    rank: string;
+    name: string;
+    code?: string;
+    change?: number;
+    consecutiveBoards?: number;
+    constituentVerified?: boolean;
+    themeRelationVerified?: boolean;
+    catalyst?: string;
+  }[];
   signal: string;
   action: string;
   risk: string;
   sessionDate: string;
-  displayType?: "主线题材" | "行业板块" | "防御方向";
+  displayType?: "主线题材" | "行业板块" | "防御方向" | "行情候选";
   driver?: string;
   attribution?: string;
   leaderMode?: "dragon" | "gainers" | "single";
+  attributionStatus?: "machine_extracted" | "unverified";
+  historyValid?: boolean;
 };
 type Payload = {
-  schemaVersion: 2;
+  schemaVersion: 2 | 3;
   dataRevision?: string;
+  isLive?: boolean;
+  marketStatus?: "trading" | "closed";
+  sourceMode?: "live_scan" | "historical_replay";
+  observedAt?: string | null;
+  signalLedger?: "append_only" | "unavailable" | "market_closed";
   available: boolean;
   sourceLabel: string;
   sessionDate: string | null;
@@ -54,6 +70,18 @@ type Payload = {
 };
 type IndexQuote = { name: string; value: number; change: number };
 type EastmoneyStock = { f12?: string; f14?: string; f3?: number; f6?: number; f109?: number };
+type SignalRecord = {
+  id: number;
+  observedAt: string;
+  captureWindow?: string;
+  sessionDate: string;
+  boardId: string;
+  themeName: string;
+  phase: string;
+  score: number;
+  leaderOneName?: string;
+  leaderTwoName?: string;
+};
 
 const number = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 1 });
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
@@ -93,7 +121,7 @@ async function browserLeaders(code: string) {
     const response = await fetch(`/api/leaders?board=${encodeURIComponent(code)}`, { cache: "no-store" });
     const payload = await response.json() as {
       available?: boolean;
-      leaders?: { rank: string; code: string; name: string; change: number; membershipVerified: true }[];
+      leaders?: { rank: string; code: string; name: string; change: number; constituentVerified: true }[];
     };
     if (response.ok && payload.available && (payload.leaders?.length ?? 0) >= 2) {
       return payload.leaders!;
@@ -127,7 +155,7 @@ async function browserLeaders(code: string) {
       code: stock.code,
       name: stock.name,
       change: stock.change,
-      membershipVerified: true,
+      constituentVerified: true,
     }));
   if (leaders.length < 2) throw new Error("insufficient constituents");
   return leaders;
@@ -160,8 +188,10 @@ function money(value: number) {
 
 function emptyPayload(): Payload {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     available: false,
+    isLive: false,
+    sourceMode: "historical_replay",
     sourceLabel: "行情暂时未连接",
     sessionDate: null,
     updatedAt: null,
@@ -189,7 +219,8 @@ export default function Home() {
   const [phaseFilter, setPhaseFilter] = useState<"全部" | Phase>("全部");
   const [showAll, setShowAll] = useState(false);
   const [query, setQuery] = useState("");
-  const [countdown, setCountdown] = useState(20);
+  const [countdown, setCountdown] = useState(30);
+  const [signalRecords, setSignalRecords] = useState<SignalRecord[]>([]);
   const enriching = useRef(false);
 
   const fillLeaders = useCallback(async (payload: Payload) => {
@@ -215,13 +246,17 @@ export default function Home() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    setCountdown(20);
+    setCountdown(30);
     try {
       const response = await fetch("/api/market", { cache: "no-store" });
       const payload = await response.json() as Payload;
       setData(payload);
       void fillLeaders(payload);
       void browserIndexes().then(setIndexes).catch(() => undefined);
+      void fetch("/api/signals?limit=12", { cache: "no-store" })
+        .then((result) => result.json())
+        .then((result: { records?: SignalRecord[] }) => setSignalRecords(result.records ?? []))
+        .catch(() => undefined);
     } catch {
       setData(emptyPayload());
     } finally {
@@ -231,8 +266,8 @@ export default function Home() {
 
   useEffect(() => {
     void Promise.resolve().then(load);
-    const refresh = window.setInterval(load, 20_000);
-    const tick = window.setInterval(() => setCountdown((value) => value <= 1 ? 20 : value - 1), 1_000);
+    const refresh = window.setInterval(load, 30_000);
+    const tick = window.setInterval(() => setCountdown((value) => value <= 1 ? 30 : value - 1), 1_000);
     return () => {
       window.clearInterval(refresh);
       window.clearInterval(tick);
@@ -287,6 +322,19 @@ export default function Home() {
       </section>
 
       <div className="simple-shell">
+        <section className={data?.isLive ? "mode-banner live" : "mode-banner replay"}>
+          <b>{data?.isLive
+            ? data.marketStatus === "closed" ? "行情源已连接 · 休市" : "前向实时监测"
+            : "历史复盘模式"}</b>
+          <span>{data?.isLive
+            ? data.signalLedger === "market_closed"
+              ? "行情源已连接，但市场休市；显示最近交易日扫描结果，不新增预测记录。"
+              : data.signalLedger === "append_only"
+              ? "每次信号都会按发现时间追加留档；这里只提示候选，不给买入结论。"
+              : "实时行情已连接，但信号账本暂不可用；当前信号不计入命中率。"
+            : "当前行情源未能完成实时扫描，页面展示的是7月24日事后复盘，不代表当时盘中已经发出信号。"}</span>
+        </section>
+
         <section className="today-grid" id="today">
           <article className="today-main">
             <div className="card-kicker">
@@ -309,7 +357,7 @@ export default function Home() {
             </div>
 
             <div className="action-box">
-              <span>现在怎么做</span>
+              <span>信号处理</span>
               <b>{strongest?.action ?? "等待数据恢复后再判断"}</b>
               <small>{strongest?.risk}</small>
             </div>
@@ -382,6 +430,7 @@ export default function Home() {
                   </div>
                   {theme.driver && <p><b>当天为什么动：</b>{theme.driver}</p>}
                   {theme.attribution && <p><b>归属校正：</b>{theme.attribution}</p>}
+                  {theme.historyValid === false && <p><b>数据校验：</b>历史连续性数据未通过一致性检查，本次持续性按0分处理。</p>}
                   <p><b>入选原因：</b>{theme.signal}</p>
                   <p><b>下一步：</b>{theme.action}</p>
                   <p><b>风险：</b>{theme.risk}</p>
@@ -410,6 +459,27 @@ export default function Home() {
             <p>资金30% · 强度25% · 扩散20% · 持续15% · 龙头10%</p>
             <small>不是涨得最多就排第一，也不会把“昨日涨停”当成板块。</small>
           </article>
+        </section>
+
+        <section className="ledger-section">
+          <div className="simple-title">
+            <div><span>前向验证</span><h2>信号首次出现记录</h2></div>
+          </div>
+          <p className="ledger-note">只追加、不覆盖。记录开始前的历史复盘不计入命中率；后续才能计算次日、3日、5日收益和最大回撤。</p>
+          {signalRecords.length ? (
+            <div className="ledger-list">
+              {signalRecords.map((record) => (
+                <div key={record.id}>
+                  <time>{new Date(record.observedAt).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}</time>
+                  <b>{record.themeName}</b>
+                  <span>{record.phase} · {record.score}分</span>
+                  <em>{record.leaderOneName ?? "无验证龙一"}{record.leaderTwoName ? ` / ${record.leaderTwoName}` : ""}</em>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="ledger-empty">尚无前向实时信号。不会用历史复盘记录冒充预测记录。</div>
+          )}
         </section>
 
         <section className="watch-section" id="watch">

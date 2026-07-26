@@ -1,7 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 const snapshot = JSON.parse(await readFile("public/market-data.json", "utf8"));
-snapshot.dataRevision = "2026-07-26-v3.1";
+snapshot.schemaVersion = 3;
+snapshot.dataRevision = "historical-replay-2026-07-24";
 
 const audit = {
   BK1326: {
@@ -102,9 +103,70 @@ for (const theme of snapshot.themes ?? []) {
     attribution: "仅保留行情源行业归属，不自动解释为当天上涨原因",
     leaderMode: "single",
   });
+  for (const leader of theme.leaders ?? []) {
+    const isCrossBoardMilitary = theme.id === "BK1382" && leader.code === "002265";
+    leader.constituentVerified = isCrossBoardMilitary
+      ? false
+      : leader.constituentVerified === true;
+    leader.themeRelationVerified = theme.leaderMode === "dragon";
+    if (isCrossBoardMilitary) leader.verificationNote = "兵装重组题材关系成立，但不是地面兵装Ⅲ成分股";
+  }
+}
+
+if (!snapshot.themes.some((theme) => theme.id === "BK0457")) {
+  snapshot.themes.push({
+    id: "BK0457",
+    name: "电网设备（历史补录）",
+    rawName: "电网设备",
+    matchedBoard: "电网设备",
+    boardType: "行业板块",
+    sessionDate: "2026-07-24",
+    score: 0,
+    phase: "观察",
+    confirmed: false,
+    change: 0,
+    netIn: 0,
+    mainNetRatio: 0,
+    breadth: 0,
+    leaderName: "长缆科技",
+    leaderChange: 9.99,
+    trend: { fiveDay: 0, twentyDay: 0, positiveDays5: 0, valid: false },
+    components: { capital: 0, strength: 0, breadth: 0, continuity: 0, leadership: 0 },
+    leaders: [
+      {
+        rank: "领涨一",
+        code: "002879",
+        name: "长缆科技",
+        change: 9.99,
+        consecutiveBoards: 4,
+        constituentVerified: true,
+        themeRelationVerified: false,
+      },
+      {
+        rank: "领涨二",
+        code: "000533",
+        name: "顺钠股份",
+        change: 10.02,
+        consecutiveBoards: 2,
+        constituentVerified: true,
+        themeRelationVerified: false,
+      },
+    ],
+    displayType: "行业板块",
+    driver: "根据7月24日盘后公开复盘补录，未作为当日盘中模型输出",
+    attribution: "板块成分关系已核验；该记录是事后补录，不计入预测命中率",
+    attributionStatus: "unverified",
+    leaderMode: "gainers",
+    signal: "盘后确认长缆科技4连板，顺钠股份、太阳电缆、汉缆股份等形成2连板梯队",
+    action: "历史补录，不作为盘中预测；实时模型将把BK0457列为强制覆盖板块",
+    risk: "缺少7月24日盘中首次触发时间和当时价格，不能用于证明提前识别",
+    historyValid: false,
+    manualReview: true,
+  });
 }
 
 snapshot.coverage.auditedDisplayed = snapshot.themes.length;
+snapshot.coverage.displayed = snapshot.themes.length;
 snapshot.methodology.name = "主线归因模型 V3";
 snapshot.methodology.rule = "先区分静态行业归属与当天上涨题材，再用资金、强度、扩散、持续性和龙头梯队判断阶段；观察和退潮板块只标领涨股，不标龙一、龙二。";
 

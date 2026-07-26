@@ -1,0 +1,1 @@
+ALTER TABLE `signal_observations` ADD `capture_window` text NOT NULL;

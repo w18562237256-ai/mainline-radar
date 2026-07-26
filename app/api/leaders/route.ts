@@ -7,7 +7,7 @@ type Leader = {
   code: string;
   name: string;
   change: number;
-  membershipVerified: true;
+  constituentVerified: true;
 };
 
 function decodeHtml(value: string) {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         code,
         name: decodeHtml(rawName),
         change: Number(rawChange),
-        membershipVerified: true,
+        constituentVerified: true,
       });
       if (leaders.length === 2) break;
     }

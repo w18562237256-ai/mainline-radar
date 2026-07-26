@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "available": true,
   "sourceLabel": "东方财富全市场快照",
   "sessionDate": "2026-07-24",
@@ -7,8 +7,8 @@
   "coverage": {
     "totalBoards": 991,
     "deepAnalyzed": 53,
-    "displayed": 14,
-    "auditedDisplayed": 14
+    "displayed": 15,
+    "auditedDisplayed": 15
   },
   "market": {
     "temperature": 63,
@@ -52,14 +52,16 @@
           "code": "301583",
           "name": "托伦斯",
           "change": 20,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": true
         },
         {
           "rank": "龙二",
           "code": "300480",
           "name": "光力科技",
           "change": 20,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": true
         }
       ],
       "signal": "半导体设备逆势领涨，托伦斯4天3板，光力科技20CM涨停；资金与涨停梯队共振，但板块5日持续性仍不足，定为启动",
@@ -104,14 +106,17 @@
           "code": "601606",
           "name": "长城军工",
           "change": 9.99,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": true
         },
         {
           "rank": "龙二",
           "code": "002265",
           "name": "建设工业",
           "change": 10.01,
-          "membershipVerified": true
+          "constituentVerified": false,
+          "themeRelationVerified": true,
+          "verificationNote": "兵装重组题材关系成立，但不是地面兵装Ⅲ成分股"
         }
       ],
       "signal": "兵装重组核心股加速：长城军工2连板，建设工业连续3日累计涨幅偏离超过20%；但行业板块仅6涨6跌，属于核心加速、尚未全面扩散",
@@ -156,14 +161,16 @@
           "code": "601728",
           "name": "中国电信",
           "change": 1.99,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "600941",
           "name": "中国移动",
           "change": 0.28,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分43、强度分34、扩散分100、持续分42、龙头分53",
@@ -205,7 +212,9 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "孚日股份"
+          "name": "孚日股份",
+          "constituentVerified": false,
+          "themeRelationVerified": false
         }
       ],
       "signal": "棉纺板块仅3涨6跌，孚日股份的涨停逻辑来自VC添加剂而非棉纺扩散，属于单股带动，不能认定为棉纺主线",
@@ -247,7 +256,9 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "涛涛车业"
+          "name": "涛涛车业",
+          "constituentVerified": false,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分50、强度分38、扩散分44、持续分41、龙头分55",
@@ -292,14 +303,16 @@
           "code": "002828",
           "name": "贝肯能源",
           "change": 1.06,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "002207",
           "name": "*ST准油",
           "change": -1.86,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分79、强度分24、扩散分13、持续分61、龙头分35",
@@ -344,14 +357,16 @@
           "code": "601328",
           "name": "交通银行",
           "change": 1.29,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "601288",
           "name": "农业银行",
           "change": 1.06,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分7、强度分33、扩散分100、持续分37、龙头分53",
@@ -393,7 +408,9 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "中锐股份"
+          "name": "中锐股份",
+          "constituentVerified": false,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分71、强度分24、扩散分29、持续分8、龙头分51",
@@ -438,14 +455,16 @@
           "code": "605198",
           "name": "安德利",
           "change": 10.01,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "300175",
           "name": "朗源股份",
           "change": 1.48,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分57、强度分23、扩散分40、持续分18、龙头分49",
@@ -487,7 +506,9 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "阿尔特"
+          "name": "阿尔特",
+          "constituentVerified": false,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分64、强度分20、扩散分33、持续分11、龙头分46",
@@ -532,14 +553,16 @@
           "code": "601998",
           "name": "中信银行",
           "change": 0.79,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "600036",
           "name": "招商银行",
           "change": 0.75,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分21、强度分29、扩散分56、持续分38、龙头分49",
@@ -581,7 +604,9 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "盛达资源"
+          "name": "盛达资源",
+          "constituentVerified": false,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分36、强度分40、扩散分0、持续分70、龙头分35",
@@ -626,14 +651,16 @@
           "code": "600722",
           "name": "金牛化工",
           "change": 4.86,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "600844",
           "name": "金煤科技",
           "change": -1.63,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分29、强度分21、扩散分10、持续分54、龙头分35",
@@ -678,14 +705,16 @@
           "code": "000792",
           "name": "盐湖股份",
           "change": -2.65,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         },
         {
           "rank": "龙二",
           "code": "000408",
           "name": "藏格矿业",
           "change": -2.76,
-          "membershipVerified": true
+          "constituentVerified": true,
+          "themeRelationVerified": false
         }
       ],
       "signal": "资金分14、强度分35、扩散分0、持续分69、龙头分35",
@@ -695,6 +724,66 @@
       "driver": "钾肥板块整体退潮，无有效进攻梯队",
       "attribution": "盐湖股份、藏格矿业仅为跌幅较小的成分股，不应标为龙头",
       "leaderMode": "gainers"
+    },
+    {
+      "id": "BK0457",
+      "name": "电网设备（历史补录）",
+      "rawName": "电网设备",
+      "matchedBoard": "电网设备",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-24",
+      "score": 0,
+      "phase": "观察",
+      "confirmed": false,
+      "change": 0,
+      "netIn": 0,
+      "mainNetRatio": 0,
+      "breadth": 0,
+      "leaderName": "长缆科技",
+      "leaderChange": 9.99,
+      "trend": {
+        "fiveDay": 0,
+        "twentyDay": 0,
+        "positiveDays5": 0,
+        "valid": false
+      },
+      "components": {
+        "capital": 0,
+        "strength": 0,
+        "breadth": 0,
+        "continuity": 0,
+        "leadership": 0
+      },
+      "leaders": [
+        {
+          "rank": "领涨一",
+          "code": "002879",
+          "name": "长缆科技",
+          "change": 9.99,
+          "consecutiveBoards": 4,
+          "constituentVerified": true,
+          "themeRelationVerified": false
+        },
+        {
+          "rank": "领涨二",
+          "code": "000533",
+          "name": "顺钠股份",
+          "change": 10.02,
+          "consecutiveBoards": 2,
+          "constituentVerified": true,
+          "themeRelationVerified": false
+        }
+      ],
+      "displayType": "行业板块",
+      "driver": "等待题材催化与行业归属交叉核验",
+      "attribution": "仅保留行情源行业归属，不自动解释为当天上涨原因",
+      "attributionStatus": "unverified",
+      "leaderMode": "single",
+      "signal": "盘后确认长缆科技4连板，顺钠股份、太阳电缆、汉缆股份等形成2连板梯队",
+      "action": "历史补录，不作为盘中预测；实时模型将把BK0457列为强制覆盖板块",
+      "risk": "缺少7月24日盘中首次触发时间和当时价格，不能用于证明提前识别",
+      "historyValid": false,
+      "manualReview": true
     }
   ],
   "methodology": {
@@ -708,5 +797,5 @@
     },
     "rule": "先区分静态行业归属与当天上涨题材，再用资金、强度、扩散、持续性和龙头梯队判断阶段；观察和退潮板块只标领涨股，不标龙一、龙二。"
   },
-  "dataRevision": "2026-07-26-v3.1"
+  "dataRevision": "historical-replay-2026-07-24"
 }

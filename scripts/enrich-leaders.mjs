@@ -24,7 +24,7 @@ async function fetchPublicBoardLeaders(code) {
       code: stockCode,
       name: rawName.trim(),
       change: Number(rawChange),
-      membershipVerified: true,
+      constituentVerified: true,
     });
     if (leaders.length === 2) break;
   }
@@ -77,7 +77,7 @@ async function fetchLeaders(code) {
           code: stock.code,
           name: stock.name,
           change: stock.change,
-          membershipVerified: true,
+          constituentVerified: true,
         }));
     } catch (error) {
       lastError = error;
@@ -91,7 +91,7 @@ let enriched = 0;
 for (const theme of snapshot.themes ?? []) {
   if (
     theme.leaders?.length >= 2
-    && theme.leaders.every((leader) => leader.membershipVerified === true)
+    && theme.leaders.every((leader) => leader.constituentVerified === true)
   ) {
     continue;
   }
