@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 
 const clamp = (value, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 const scale = (value, low, high) => clamp(((value - low) / (high - low)) * 100);
+const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function fetchFirst(urls) {
   let lastError;
@@ -89,6 +90,7 @@ async function getHistory(code) {
 }
 
 async function getLeaders(code) {
+  await delay(700);
   const params = new URLSearchParams({
     pn: "1",
     pz: "100",
@@ -198,7 +200,8 @@ const finalistsMap = new Map();
 const finalists = [...finalistsMap.values()];
 
 const boardById = new Map(allBoards.map((board) => [board.f12, board]));
-const leaderResults = await mapLimit(finalists, 5, async (theme) => {
+await delay(15_000);
+const leaderResults = await mapLimit(finalists, 2, async (theme) => {
   try {
     return { id: theme.id, leaders: await getLeaders(theme.id) };
   } catch {
