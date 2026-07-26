@@ -342,12 +342,18 @@ export async function getLiveMarket() {
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai" }).format(now);
   const sessionDate = themes.map((theme) => theme.sessionDate).sort().at(-1) ?? null;
   const marketStatus = sessionDate === today ? "trading" : "closed";
-  const monitoredThemes = themes.map((theme) => ({
+  // A detail page can lag behind the overview. Never let an older board
+  // compete with boards from the latest available session.
+  const monitoredThemes = themes
+    .filter((theme) => theme.sessionDate === sessionDate)
+    .map((theme) => ({
     ...theme,
     confirmed: marketStatus === "trading" && theme.confirmed,
-  }));
+    }));
   const confirmedThemes = monitoredThemes.filter((theme) => theme.confirmed);
-  const firstCandidate = monitoredThemes.find((theme) => theme.phase !== "退潮");
+  const firstCandidate = marketStatus === "trading"
+    ? monitoredThemes.find((theme) => theme.phase !== "退潮")
+    : undefined;
   return {
     schemaVersion: 3,
     dataRevision: `live-${now.toISOString()}`,

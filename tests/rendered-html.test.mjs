@@ -45,6 +45,8 @@ test("V4 model scans live boards and keeps attribution separate from membership"
   assert.doesNotMatch(liveModel, /if \(!byId\.has\(id\)\) byId\.set/);
   assert.match(liveModel, /positiveDays5 >= 3/);
   assert.match(liveModel, /strongestThemeId: confirmedThemes\[0\]\?\.id \?\? null/);
+  assert.match(liveModel, /\.filter\(\(theme\) => theme\.sessionDate === sessionDate\)/);
+  assert.match(liveModel, /const firstCandidate = marketStatus === "trading"/);
   assert.match(liveModel, /constituentVerified: true/);
   assert.match(liveModel, /themeRelationVerified: false/);
   assert.match(liveModel, /historyValid/);

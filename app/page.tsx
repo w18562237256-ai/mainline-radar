@@ -281,8 +281,10 @@ export default function Home() {
   const strongest = data?.market.strongestThemeId
     ? ranked.find((theme) => theme.id === data.market.strongestThemeId)
     : undefined;
-  const nextTheme = ranked.find((theme) => theme.id === data?.market.nextThemeId)
-    ?? ranked.find((theme) => theme.phase !== "退潮");
+  const nextTheme = data?.marketStatus === "trading"
+    ? ranked.find((theme) => theme.id === data?.market.nextThemeId)
+      ?? ranked.find((theme) => theme.phase !== "退潮")
+    : undefined;
   const filtered = ranked.filter((theme) =>
     (phaseFilter === "全部" || theme.phase === phaseFilter)
     && (!query || `${theme.name}${theme.matchedBoard}${theme.leaders.map((leader) => leader.name).join("")}`.includes(query))
@@ -371,7 +373,7 @@ export default function Home() {
               <span><b>{data?.market.temperature ?? 0}</b><small>主线温度</small></span>
             </div>
             <div>
-              <span className="side-label">下一个看谁</span>
+              <span className="side-label">{data?.marketStatus === "trading" ? "下一个看谁" : "休市不预测下一主线"}</span>
               <h2>{nextTheme?.name ?? "暂无"}</h2>
               <p>{nextTheme ? `${nextTheme.phase} · ${nextTheme.score}分 · 龙一 ${nextTheme.leaders[0]?.name ?? "待确认"}` : "等待新方向"}</p>
             </div>
