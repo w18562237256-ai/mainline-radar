@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 const snapshot = JSON.parse(await readFile("public/market-data.json", "utf8"));
+snapshot.dataRevision = "2026-07-26-v3.1";
 
 const audit = {
   BK1326: {

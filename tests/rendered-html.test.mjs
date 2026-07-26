@@ -54,6 +54,7 @@ test("published snapshot follows the audited V3 contract", async () => {
     await readFile(new URL("../public/market-data.json", import.meta.url), "utf8"),
   );
   assert.equal(snapshot.schemaVersion, 2);
+  assert.equal(snapshot.dataRevision, "2026-07-26-v3.1");
   assert.ok(snapshot.themes.length > 0);
   assert.notEqual(snapshot.market.strongestThemeId, snapshot.market.nextThemeId);
   const military = snapshot.themes.find((theme) => theme.id === "BK1382");

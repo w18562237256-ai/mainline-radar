@@ -36,6 +36,7 @@ type Theme = {
 };
 type Payload = {
   schemaVersion: 2;
+  dataRevision?: string;
   available: boolean;
   sourceLabel: string;
   sessionDate: string | null;
@@ -266,7 +267,7 @@ export default function Home() {
           <a href="#sectors">板块</a>
           <a href="#watch">自选</a>
         </nav>
-        <button className="refresh-button" onClick={load} disabled={loading}>
+        <button className="refresh-button" onClick={load} disabled={loading} title={data?.dataRevision ?? "等待数据版本"}>
           <i className={data?.available ? "live-dot" : "live-dot off"} />
           {loading ? "刷新中" : `${countdown}s 刷新`}
         </button>
@@ -282,7 +283,7 @@ export default function Home() {
         ))}
         <div><span>主线温度</span><b>{data?.market.temperature ?? 0}</b><em>/ 100</em></div>
         <div><span>确认主线</span><b>{data?.market.mainlineCount ?? 0}</b><em>个</em></div>
-        <div className="market-date"><span>数据日期</span><b>{data?.sessionDate ?? "—"}</b><em>{data?.sourceLabel ?? "等待行情"}</em></div>
+        <div className="market-date"><span>数据日期</span><b>{data?.sessionDate ?? "—"}</b><em>{data?.sourceLabel ?? "等待行情"} · {data?.methodology.name ?? "等待模型"}</em></div>
       </section>
 
       <div className="simple-shell">
