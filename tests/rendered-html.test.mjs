@@ -21,10 +21,11 @@ test("server-renders the market mainline dashboard shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>主线雷达｜A股市场主线监测<\/title>/);
-  assert.match(html, /当前交易提示/);
+  assert.match(html, /今天先看这个/);
   assert.match(html, /主线温度/);
-  assert.match(html, /潜在龙头雷达/);
-  assert.match(html, /板块强度排行/);
+  assert.match(html, /龙一/);
+  assert.match(html, /龙二/);
+  assert.match(html, /只看最重要的/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape/);
 });
 
@@ -32,8 +33,9 @@ test("V2 model owns ranking, phases, and five-factor weights", async () => {
   const script = await readFile(new URL("../scripts/update-market.mjs", import.meta.url), "utf8");
   assert.match(script, /NON_THEME_BOARD/);
   assert.match(script, /昨日\|首板\|连板\|涨停/);
-  assert.match(script, /replace\(\/\[ⅡⅢ\]\+\$\//);
-  assert.match(script, /军工·装备/);
+  assert.doesNotMatch(script, /themeGroup|军工·装备|半导体产业链/);
+  assert.match(script, /name: theme\.rawName/);
+  assert.match(script, /membershipVerified: true/);
   assert.match(script, /schemaVersion: 2/);
   assert.match(script, /capital: 30/);
   assert.match(script, /strength: 25/);
@@ -53,6 +55,7 @@ test("published snapshot follows the V2 contract", async () => {
   for (const theme of snapshot.themes) {
     assert.ok(["加速", "启动", "观察", "退潮"].includes(theme.phase));
     assert.equal(typeof theme.score, "number");
+    assert.equal(theme.name, theme.matchedBoard);
     assert.deepEqual(
       Object.keys(theme.components).sort(),
       ["breadth", "capital", "continuity", "leadership", "strength"],

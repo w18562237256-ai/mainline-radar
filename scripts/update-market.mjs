@@ -97,7 +97,7 @@ async function getLeaders(code) {
     pn: "1", pz: "100", po: "1", np: "1",
     ut: "bd1d9ddb04089700cf9c27f6f7426281",
     fltt: "2", invt: "2", fid: "f3",
-    fs: `b:${code} f:!50`, fields: "f14,f3,f6,f109",
+    fs: `b:${code} f:!50`, fields: "f12,f14,f3,f6,f109",
   });
   const payload = await fetchFirst([
     `https://29.push2.eastmoney.com/api/qt/clist/get?${params}`,
@@ -108,12 +108,20 @@ async function getLeaders(code) {
   const stocks = (payload.data.diff ?? []).filter((stock) => stock.f14 && !stock.f14.includes("退"));
   const maxAmount = Math.max(...stocks.map((stock) => Number(stock.f6 ?? 0)), 1);
   return stocks.map((stock) => ({
+    code: stock.f12,
     name: stock.f14,
+    change: Number(stock.f3 ?? 0),
     score: scale(Number(stock.f109 ?? stock.f3 ?? 0), -5, 20) * .45
       + scale(Number(stock.f3 ?? 0), -3, 10) * .25
       + (Number(stock.f6 ?? 0) / maxAmount) * 30,
   })).sort((a, b) => b.score - a.score).slice(0, 2)
-    .map((stock, index) => ({ rank: index ? "龙二" : "龙一", name: stock.name }));
+    .map((stock, index) => ({
+      rank: index ? "龙二" : "龙一",
+      code: stock.code,
+      name: stock.name,
+      change: stock.change,
+      membershipVerified: true,
+    }));
 }
 
 function periodReturn(history, sessions) {
@@ -125,15 +133,6 @@ function periodReturn(history, sessions) {
 function percentile(value, values) {
   if (!values.length) return 0;
   return values.filter((item) => item <= value).length / values.length * 100;
-}
-
-function themeGroup(rawName) {
-  const name = rawName.replace(/[ⅡⅢ]+$/, "");
-  if (/地面兵装|航空装备|航天装备|军工电子/.test(name)) return "军工·装备";
-  if (/黄金|白银|贵金属/.test(name)) return "贵金属";
-  if (/油田服务|油服工程|油气及炼化工程/.test(name)) return "油气服务";
-  if (/半导体设备|集成电路封测|中芯概念|高带宽内存/.test(name)) return "半导体设备";
-  return name;
 }
 
 function selectCandidates(boards) {
@@ -238,27 +237,26 @@ const scored = resolved.map((theme) => {
     + components.continuity * .15
     + components.leadership * .1,
   );
-  const base = { ...theme, name: themeGroup(theme.rawName), components, score };
+  const base = { ...theme, name: theme.rawName, components, score };
   const phase = phaseFor(base);
   const confirmed = score >= 65 && phase !== "退潮" && components.capital >= 45 && components.breadth >= 40;
   return {
     ...base,
     phase,
     confirmed,
-    leaders: theme.leaderName ? [{ rank: "龙一", name: theme.leaderName }] : [],
+    leaders: theme.leaderName ? [{
+      rank: "龙一",
+      name: theme.leaderName,
+      change: theme.leaderChange,
+      membershipVerified: true,
+    }] : [],
     signal: `资金分${components.capital}、强度分${components.strength}、扩散分${components.breadth}、持续分${components.continuity}、龙头分${components.leadership}`,
     action: actionFor(phase),
     risk: "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
   };
 });
 
-const deduped = [...scored.reduce((groups, theme) => {
-  const previous = groups.get(theme.name);
-  if (!previous || theme.score > previous.score) groups.set(theme.name, theme);
-  return groups;
-}, new Map()).values()].sort((a, b) => b.score - a.score);
-
-const finalists = deduped.slice(0, 30);
+const finalists = scored.sort((a, b) => b.score - a.score).slice(0, 30);
 await wait(8_000);
 const leaderResults = await mapLimit(finalists, 2, async (theme) => {
   try {

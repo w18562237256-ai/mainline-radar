@@ -16,7 +16,7 @@ async function fetchLeaders(code) {
     invt: "2",
     fid: "f3",
     fs: `b:${code} f:!50`,
-    fields: "f14,f3,f6,f109",
+    fields: "f12,f14,f3,f6,f109",
   });
   const hosts = ["29.push2.eastmoney.com", "17.push2.eastmoney.com", "79.push2.eastmoney.com", "7.push2.eastmoney.com", "82.push2.eastmoney.com"];
   let lastError;
@@ -32,12 +32,20 @@ async function fetchLeaders(code) {
       if (stocks.length < 2) throw new Error(`fewer than two constituents for ${code}`);
       const maxAmount = Math.max(...stocks.map((stock) => Number(stock.f6 ?? 0)), 1);
       return stocks.map((stock) => ({
+        code: stock.f12,
         name: stock.f14,
+        change: Number(stock.f3 ?? 0),
         score: scale(Number(stock.f109 ?? stock.f3 ?? 0), -5, 20) * .45
           + scale(Number(stock.f3 ?? 0), -3, 10) * .25
           + (Number(stock.f6 ?? 0) / maxAmount) * 30,
       })).sort((a, b) => b.score - a.score).slice(0, 2)
-        .map((stock, index) => ({ rank: index ? "龙二" : "龙一", name: stock.name }));
+        .map((stock, index) => ({
+          rank: index ? "龙二" : "龙一",
+          code: stock.code,
+          name: stock.name,
+          change: stock.change,
+          membershipVerified: true,
+        }));
     } catch (error) {
       lastError = error;
     }

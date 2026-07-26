@@ -19,7 +19,7 @@
   "themes": [
     {
       "id": "BK1326",
-      "name": "半导体产业链",
+      "name": "半导体设备",
       "rawName": "半导体设备",
       "matchedBoard": "半导体设备",
       "boardType": "行业板块",
@@ -57,7 +57,7 @@
     },
     {
       "id": "BK1382",
-      "name": "军工装备",
+      "name": "地面兵装Ⅲ",
       "rawName": "地面兵装Ⅲ",
       "matchedBoard": "地面兵装Ⅲ",
       "boardType": "行业板块",
@@ -209,7 +209,7 @@
     },
     {
       "id": "BK1573",
-      "name": "油气服务",
+      "name": "油田服务",
       "rawName": "油田服务",
       "matchedBoard": "油田服务",
       "boardType": "行业板块",
@@ -247,7 +247,7 @@
     },
     {
       "id": "BK1611",
-      "name": "国有大型银行",
+      "name": "国有大型银行Ⅲ",
       "rawName": "国有大型银行Ⅲ",
       "matchedBoard": "国有大型银行Ⅲ",
       "boardType": "行业板块",
@@ -399,7 +399,7 @@
     },
     {
       "id": "BK1610",
-      "name": "股份制银行",
+      "name": "股份制银行Ⅲ",
       "rawName": "股份制银行Ⅲ",
       "matchedBoard": "股份制银行Ⅲ",
       "boardType": "行业板块",
@@ -437,7 +437,7 @@
     },
     {
       "id": "BK1616",
-      "name": "贵金属",
+      "name": "白银",
       "rawName": "白银",
       "matchedBoard": "白银",
       "boardType": "行业板块",
