@@ -1,51 +1,995 @@
 {
-  "schemaVersion": 3,
+  "schemaVersion": 2,
   "available": true,
   "sourceLabel": "东方财富全市场快照",
-  "sessionDate": "2026-07-24",
-  "updatedAt": "14:43",
+  "sessionDate": "2026-07-27",
+  "updatedAt": "00:05",
   "coverage": {
-    "totalBoards": 991,
-    "deepAnalyzed": 53,
-    "displayed": 15,
-    "auditedDisplayed": 15
+    "totalBoards": 966,
+    "deepAnalyzed": 90,
+    "displayed": 30
   },
   "market": {
-    "temperature": 63,
-    "mainlineCount": 2,
-    "conclusion": "兵装重组核心加速 · 半导体设备启动",
-    "strongestThemeId": "BK1382",
-    "nextThemeId": "BK1326"
+    "temperature": 78,
+    "mainlineCount": 30,
+    "conclusion": "主线清晰 · 资金聚焦",
+    "strongestThemeId": "BK1462",
+    "nextThemeId": "BK0546"
   },
   "themes": [
     {
+      "id": "BK1462",
+      "rawName": "玻纤制造",
+      "matchedBoard": "玻纤制造",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 9.43,
+      "netIn": 36.40261504,
+      "mainNetRatio": 16.3,
+      "breadth": 1,
+      "leaderName": "宏和科技",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 8.70466173455744,
+        "twentyDay": -35.070456009077255,
+        "positiveDays5": 3
+      },
+      "name": "玻纤制造",
+      "components": {
+        "capital": 80,
+        "strength": 87,
+        "breadth": 100,
+        "continuity": 51,
+        "leadership": 73
+      },
+      "score": 81,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "宏和科技",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅8.7%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0546",
+      "rawName": "玻璃玻纤",
+      "matchedBoard": "玻璃玻纤",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.83,
+      "netIn": 36.64711664,
+      "mainNetRatio": 15.85,
+      "breadth": 1,
+      "leaderName": "宏和科技",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 5.627672707653253,
+        "twentyDay": -24.25948457748045,
+        "positiveDays5": 3
+      },
+      "name": "玻璃玻纤",
+      "components": {
+        "capital": 81,
+        "strength": 79,
+        "breadth": 100,
+        "continuity": 43,
+        "leadership": 73
+      },
+      "score": 78,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "宏和科技",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分43，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1177",
+      "rawName": "荣耀概念",
+      "matchedBoard": "荣耀概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.68,
+      "netIn": 721.46921728,
+      "mainNetRatio": 39.48,
+      "breadth": 0.9272727272727272,
+      "leaderName": "新亚制程",
+      "leaderChange": 10.09,
+      "trend": {
+        "fiveDay": 7.163637306505555,
+        "twentyDay": -17.640189709457577,
+        "positiveDays5": 2
+      },
+      "name": "荣耀概念",
+      "components": {
+        "capital": 98,
+        "strength": 66,
+        "breadth": 93,
+        "continuity": 41,
+        "leadership": 73
+      },
+      "score": 78,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "新亚制程",
+          "change": 10.09,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分41，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 10.09,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0833",
+      "rawName": "小米概念",
+      "matchedBoard": "小米概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.43,
+      "netIn": 741.46774272,
+      "mainNetRatio": 26.11,
+      "breadth": 0.9473684210526315,
+      "leaderName": "紫建电子",
+      "leaderChange": 19.99,
+      "trend": {
+        "fiveDay": 4.733688915599288,
+        "twentyDay": -16.040228543898362,
+        "positiveDays5": 3
+      },
+      "name": "小米概念",
+      "components": {
+        "capital": 100,
+        "strength": 59,
+        "breadth": 95,
+        "continuity": 41,
+        "leadership": 81
+      },
+      "score": 78,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "紫建电子",
+          "change": 19.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分41，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 19.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0890",
+      "rawName": "MLCC",
+      "matchedBoard": "MLCC",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.22,
+      "netIn": 33.08186368,
+      "mainNetRatio": 7.26,
+      "breadth": 1,
+      "leaderName": "风华高科",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 10.288604567623526,
+        "twentyDay": -34.32596052939479,
+        "positiveDays5": 3
+      },
+      "name": "MLCC",
+      "components": {
+        "capital": 69,
+        "strength": 84,
+        "breadth": 100,
+        "continuity": 56,
+        "leadership": 73
+      },
+      "score": 77,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "风华高科",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅10.3%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1339",
+      "rawName": "被动元件",
+      "matchedBoard": "被动元件",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.58,
+      "netIn": 24.87234848,
+      "mainNetRatio": 9.92,
+      "breadth": 0.9473684210526315,
+      "leaderName": "风华高科",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 8.51572521401085,
+        "twentyDay": -32.42192526461427,
+        "positiveDays5": 3
+      },
+      "name": "被动元件",
+      "components": {
+        "capital": 71,
+        "strength": 83,
+        "breadth": 95,
+        "continuity": 51,
+        "leadership": 73
+      },
+      "score": 76,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "风华高科",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅8.5%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1201",
+      "rawName": "电子",
+      "matchedBoard": "电子",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.4,
+      "netIn": 726.84875776,
+      "mainNetRatio": 9.76,
+      "breadth": 0.923679060665362,
+      "leaderName": "至纯科技",
+      "leaderChange": 9.99,
+      "trend": {
+        "fiveDay": 6.658262703658191,
+        "twentyDay": -23.26753020735236,
+        "positiveDays5": 2
+      },
+      "name": "电子",
+      "components": {
+        "capital": 95,
+        "strength": 63,
+        "breadth": 92,
+        "continuity": 40,
+        "leadership": 72
+      },
+      "score": 76,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "至纯科技",
+          "change": 9.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分40，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0877",
+      "rawName": "PCB",
+      "matchedBoard": "PCB",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 4.74,
+      "netIn": 102.66985216,
+      "mainNetRatio": 6.16,
+      "breadth": 0.9879518072289156,
+      "leaderName": "贤丰控股",
+      "leaderChange": 9.98,
+      "trend": {
+        "fiveDay": 6.660206071388597,
+        "twentyDay": -27.614903008107973,
+        "positiveDays5": 3
+      },
+      "name": "PCB",
+      "components": {
+        "capital": 80,
+        "strength": 73,
+        "breadth": 99,
+        "continuity": 46,
+        "leadership": 72
+      },
+      "score": 76,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "贤丰控股",
+          "change": 9.98,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅6.7%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 9.98,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1750",
+      "rawName": "2026中报扭亏",
+      "matchedBoard": "2026中报扭亏",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.37,
+      "netIn": 722.65407488,
+      "mainNetRatio": 33.94,
+      "breadth": 0.9690721649484536,
+      "leaderName": "中利集团",
+      "leaderChange": 10.07,
+      "trend": {
+        "fiveDay": 3.0212444171373143,
+        "twentyDay": -9.296035453098506,
+        "positiveDays5": 3
+      },
+      "name": "2026中报扭亏",
+      "components": {
+        "capital": 99,
+        "strength": 55,
+        "breadth": 97,
+        "continuity": 37,
+        "leadership": 73
+      },
+      "score": 76,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "中利集团",
+          "change": 10.07,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分37，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 10.07,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0732",
+      "rawName": "贵金属",
+      "matchedBoard": "贵金属",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.76,
+      "netIn": 6.43905936,
+      "mainNetRatio": 3.82,
+      "breadth": 1,
+      "leaderName": "湖南白银",
+      "leaderChange": 6.66,
+      "trend": {
+        "fiveDay": 15.151053953276005,
+        "twentyDay": 9.366869037294023,
+        "positiveDays5": 4
+      },
+      "name": "贵金属",
+      "components": {
+        "capital": 55,
+        "strength": 83,
+        "breadth": 100,
+        "continuity": 84,
+        "leadership": 57
+      },
+      "score": 76,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "湖南白银",
+          "change": 6.66,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分84，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 6.66,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1152",
+      "rawName": "高带宽内存",
+      "matchedBoard": "高带宽内存",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 4.36,
+      "netIn": 35.33485568,
+      "mainNetRatio": 4.56,
+      "breadth": 1,
+      "leaderName": "至纯科技",
+      "leaderChange": 9.99,
+      "trend": {
+        "fiveDay": 11.604216911339504,
+        "twentyDay": -29.665185441155028,
+        "positiveDays5": 3
+      },
+      "name": "高带宽内存",
+      "components": {
+        "capital": 64,
+        "strength": 81,
+        "breadth": 100,
+        "continuity": 59,
+        "leadership": 72
+      },
+      "score": 76,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "至纯科技",
+          "change": 9.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅11.6%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 9.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0459",
+      "rawName": "元件",
+      "matchedBoard": "元件",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.28,
+      "netIn": 63.9061248,
+      "mainNetRatio": 6.68,
+      "breadth": 0.9848484848484849,
+      "leaderName": "贤丰控股",
+      "leaderChange": 9.98,
+      "trend": {
+        "fiveDay": 7.045701879084643,
+        "twentyDay": -28.101949052337194,
+        "positiveDays5": 3
+      },
+      "name": "元件",
+      "components": {
+        "capital": 73,
+        "strength": 78,
+        "breadth": 98,
+        "continuity": 47,
+        "leadership": 72
+      },
+      "score": 75,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "贤丰控股",
+          "change": 9.98,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅7.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 9.98,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0976",
+      "rawName": "被动元件概念",
+      "matchedBoard": "被动元件概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.04,
+      "netIn": 29.72169472,
+      "mainNetRatio": 7.11,
+      "breadth": 0.9666666666666667,
+      "leaderName": "风华高科",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 9.453032666761207,
+        "twentyDay": -29.3527116052984,
+        "positiveDays5": 3
+      },
+      "name": "被动元件概念",
+      "components": {
+        "capital": 68,
+        "strength": 81,
+        "breadth": 97,
+        "continuity": 53,
+        "leadership": 73
+      },
+      "score": 75,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "风华高科",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅9.5%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1137",
+      "rawName": "存储芯片",
+      "matchedBoard": "存储芯片",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 2.85,
+      "netIn": 650.74500096,
+      "mainNetRatio": 14.39,
+      "breadth": 0.9172932330827067,
+      "leaderName": "至纯科技",
+      "leaderChange": 9.99,
+      "trend": {
+        "fiveDay": 7.552299274909591,
+        "twentyDay": -26.210744799960505,
+        "positiveDays5": 2
+      },
+      "name": "存储芯片",
+      "components": {
+        "capital": 94,
+        "strength": 61,
+        "breadth": 92,
+        "continuity": 42,
+        "leadership": 72
+      },
+      "score": 75,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "至纯科技",
+          "change": 9.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分42，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0923",
+      "rawName": "抖音概念(字节概念)",
+      "matchedBoard": "抖音概念(字节概念)",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.64,
+      "netIn": 709.09727744,
+      "mainNetRatio": 35.41,
+      "breadth": 0.9354838709677419,
+      "leaderName": "智度股份",
+      "leaderChange": 10.05,
+      "trend": {
+        "fiveDay": 2.17837556297682,
+        "twentyDay": -3.105842703158135,
+        "positiveDays5": 3
+      },
+      "name": "抖音概念(字节概念)",
+      "components": {
+        "capital": 97,
+        "strength": 55,
+        "breadth": 94,
+        "continuity": 38,
+        "leadership": 73
+      },
+      "score": 75,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "智度股份",
+          "change": 10.05,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分38，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 10.05,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0917",
+      "rawName": "半导体概念",
+      "matchedBoard": "半导体概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.01,
+      "netIn": 679.77007104,
+      "mainNetRatio": 9.82,
+      "breadth": 0.9174852652259332,
+      "leaderName": "至纯科技",
+      "leaderChange": 9.99,
+      "trend": {
+        "fiveDay": 6.500392144309108,
+        "twentyDay": -24.066714406762735,
+        "positiveDays5": 2
+      },
+      "name": "半导体概念",
+      "components": {
+        "capital": 92,
+        "strength": 60,
+        "breadth": 92,
+        "continuity": 40,
+        "leadership": 72
+      },
+      "score": 74,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "至纯科技",
+          "change": 9.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分40，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1637",
+      "rawName": "东方财富热股",
+      "matchedBoard": "东方财富热股",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 2.86,
+      "netIn": 658.53341696,
+      "mainNetRatio": 11.9,
+      "breadth": 0.7171717171717171,
+      "leaderName": "爱丽家居",
+      "leaderChange": 10,
+      "trend": {
+        "fiveDay": 7.957412882951198,
+        "twentyDay": -2.641039243881671,
+        "positiveDays5": 4
+      },
+      "name": "东方财富热股",
+      "components": {
+        "capital": 94,
+        "strength": 62,
+        "breadth": 72,
+        "continuity": 59,
+        "leadership": 73
+      },
+      "score": 74,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "爱丽家居",
+          "change": 10,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅8.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK0689",
+      "rawName": "阿里概念",
+      "matchedBoard": "阿里概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.11,
+      "netIn": 719.23035904,
+      "mainNetRatio": 29.81,
+      "breadth": 0.9248554913294798,
+      "leaderName": "紫建电子",
+      "leaderChange": 19.99,
+      "trend": {
+        "fiveDay": 2.108771424707623,
+        "twentyDay": -3.919693287797177,
+        "positiveDays5": 3
+      },
+      "name": "阿里概念",
+      "components": {
+        "capital": 97,
+        "strength": 51,
+        "breadth": 92,
+        "continuity": 37,
+        "leadership": 81
+      },
+      "score": 74,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "紫建电子",
+          "change": 19.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分37，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 19.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1616",
+      "rawName": "白银",
+      "matchedBoard": "白银",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 4.48,
+      "netIn": 1.63479376,
+      "mainNetRatio": 3.33,
+      "breadth": 1,
+      "leaderName": "湖南白银",
+      "leaderChange": 6.66,
+      "trend": {
+        "fiveDay": 23.079480914308114,
+        "twentyDay": 4.87675918266155,
+        "positiveDays5": 4
+      },
+      "name": "白银",
+      "components": {
+        "capital": 45,
+        "strength": 89,
+        "breadth": 100,
+        "continuity": 81,
+        "leadership": 57
+      },
+      "score": 74,
+      "phase": "观察",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "湖南白银",
+          "change": 6.66,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "资金分45、强度分89、扩散分100，尚未同时满足主线条件",
+      "action": "暂不下结论，等待资金、扩散和龙头形成共振",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 6.66,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "gainers"
+    },
+    {
+      "id": "BK1340",
+      "rawName": "印制电路板",
+      "matchedBoard": "印制电路板",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.16,
+      "netIn": 39.03377664,
+      "mainNetRatio": 5.53,
+      "breadth": 1,
+      "leaderName": "贤丰控股",
+      "leaderChange": 9.98,
+      "trend": {
+        "fiveDay": 6.444836253141761,
+        "twentyDay": -26.360014821714106,
+        "positiveDays5": 2
+      },
+      "name": "印制电路板",
+      "components": {
+        "capital": 70,
+        "strength": 76,
+        "breadth": 100,
+        "continuity": 39,
+        "leadership": 72
+      },
+      "score": 73,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "贤丰控股",
+          "change": 9.98,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分39，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.98,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1617",
+      "rawName": "黄金",
+      "matchedBoard": "黄金",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.54,
+      "netIn": 4.80426528,
+      "mainNetRatio": 4.01,
+      "breadth": 1,
+      "leaderName": "招金黄金",
+      "leaderChange": 5.65,
+      "trend": {
+        "fiveDay": 12.840046388591485,
+        "twentyDay": 10.531376447987451,
+        "positiveDays5": 4
+      },
+      "name": "黄金",
+      "components": {
+        "capital": 54,
+        "strength": 77,
+        "breadth": 100,
+        "continuity": 79,
+        "leadership": 53
+      },
+      "score": 73,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "招金黄金",
+          "change": 5.65,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分79，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 5.65,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
       "id": "BK1326",
-      "name": "半导体设备",
       "rawName": "半导体设备",
       "matchedBoard": "半导体设备",
       "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 69,
-      "phase": "启动",
-      "confirmed": true,
-      "change": 3.18,
-      "netIn": 23.46458368,
-      "mainNetRatio": 0,
-      "breadth": 0.8333333333333334,
-      "leaderName": "托伦斯",
-      "leaderChange": 20,
+      "sessionDate": "2026-07-27",
+      "change": 2.84,
+      "netIn": 9.30355712,
+      "mainNetRatio": 1.45,
+      "breadth": 1,
+      "leaderName": "至纯科技",
+      "leaderChange": 9.99,
       "trend": {
-        "fiveDay": 1.6785601660277205,
-        "twentyDay": -21.369884158160303,
-        "positiveDays5": 0
+        "fiveDay": 14.076330475497567,
+        "twentyDay": -24.719814297097553,
+        "positiveDays5": 3
       },
+      "name": "半导体设备",
       "components": {
-        "capital": 100,
-        "strength": 51,
-        "breadth": 83,
-        "continuity": 18,
-        "leadership": 69
+        "capital": 51,
+        "strength": 74,
+        "breadth": 100,
+        "continuity": 66,
+        "leadership": 96
       },
+      "score": 73,
+      "phase": "加速",
+      "confirmed": true,
       "leaders": [
         {
           "rank": "龙一",
@@ -64,42 +1008,43 @@
           "themeRelationVerified": true
         }
       ],
-      "signal": "半导体设备逆势领涨，托伦斯4天3板，光力科技20CM涨停；资金与涨停梯队共振，但板块5日持续性仍不足，定为启动",
-      "action": "加入重点观察，确认下一次刷新仍有资金承接",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "signal": "托伦斯、光力科技形成龙头梯队，核心平均涨幅20.0%，近5日板块涨幅14.1%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 20,
       "displayType": "主线题材",
-      "driver": "全球半导体扩产、国产设备替代与长鑫科技资本开支预期",
-      "attribution": "行业归属与当天上涨逻辑一致；托伦斯4天3板，光力科技20CM涨停，龙头梯队成立",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
       "leaderMode": "dragon"
     },
     {
       "id": "BK1382",
-      "name": "兵装重组·军工",
       "rawName": "地面兵装Ⅲ",
       "matchedBoard": "地面兵装Ⅲ",
       "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
+      "sessionDate": "2026-07-27",
+      "change": 2.9,
+      "netIn": 2.07674128,
+      "mainNetRatio": 2.97,
+      "breadth": 0.9166666666666666,
+      "leaderName": "长城军工",
+      "leaderChange": 10.02,
+      "trend": {
+        "fiveDay": 13.998246427011685,
+        "twentyDay": 0.825895555614542,
+        "positiveDays5": 5
+      },
+      "name": "地面兵装Ⅲ",
+      "components": {
+        "capital": 48,
+        "strength": 75,
+        "breadth": 92,
+        "continuity": 83,
+        "leadership": 88
+      },
       "score": 73,
       "phase": "加速",
       "confirmed": true,
-      "change": 2.1,
-      "netIn": 3.82371552,
-      "mainNetRatio": 0,
-      "breadth": 0.5,
-      "leaderName": "长城军工",
-      "leaderChange": 2.1,
-      "trend": {
-        "fiveDay": 10.107717132358541,
-        "twentyDay": -4.132252862488062,
-        "positiveDays5": 3
-      },
-      "components": {
-        "capital": 93,
-        "strength": 60,
-        "breadth": 50,
-        "continuity": 65,
-        "leadership": 100
-      },
       "leaders": [
         {
           "rank": "龙一",
@@ -119,671 +1064,329 @@
           "verificationNote": "兵装重组题材关系成立，但不是地面兵装Ⅲ成分股"
         }
       ],
-      "signal": "兵装重组核心股加速：长城军工2连板，建设工业连续3日累计涨幅偏离超过20%；但行业板块仅6涨6跌，属于核心加速、尚未全面扩散",
-      "action": "核心股已进入加速段，不追一致；观察长城军工、建设工业分歧后的承接，以及上涨家数能否扩大",
-      "risk": "长城军工与建设工业同时断板或转弱，且板块上涨家数仍未扩散时，加速信号失效",
+      "signal": "长城军工、建设工业形成龙头梯队，核心平均涨幅10.0%，近5日板块涨幅14.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10,
       "displayType": "主线题材",
-      "driver": "兵装重组预期叠加军工订单回暖",
-      "attribution": "行情源板块是地面兵装Ⅲ；建设工业虽不是该细分行业成分股，但属于本轮兵装重组核心股，因此按题材龙二处理",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
       "leaderMode": "dragon"
     },
     {
-      "id": "BK1587",
-      "name": "电信运营商",
-      "rawName": "电信运营商",
-      "matchedBoard": "电信运营商",
+      "id": "BK1547",
+      "rawName": "跨境电商",
+      "matchedBoard": "跨境电商",
       "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 53,
-      "phase": "观察",
-      "confirmed": false,
-      "change": 0.75,
-      "netIn": -1.1750664,
-      "mainNetRatio": 0,
+      "sessionDate": "2026-07-27",
+      "change": 5.11,
+      "netIn": 1.65119838,
+      "mainNetRatio": 9.75,
       "breadth": 1,
-      "leaderName": "中国电信",
-      "leaderChange": 0.75,
+      "leaderName": "跨境通",
+      "leaderChange": 9.97,
       "trend": {
-        "fiveDay": 2.5499487574961233,
-        "twentyDay": 11.340751349564826,
-        "positiveDays5": 0
+        "fiveDay": 7.0084087423959,
+        "twentyDay": 0.4297784683754857,
+        "positiveDays5": 3
       },
+      "name": "跨境电商",
       "components": {
-        "capital": 43,
-        "strength": 34,
+        "capital": 59,
+        "strength": 77,
         "breadth": 100,
-        "continuity": 42,
-        "leadership": 53
+        "continuity": 52,
+        "leadership": 72
       },
+      "score": 72,
+      "phase": "加速",
+      "confirmed": true,
       "leaders": [
         {
           "rank": "龙一",
-          "code": "601728",
-          "name": "中国电信",
-          "change": 1.99,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "600941",
-          "name": "中国移动",
-          "change": 0.28,
-          "constituentVerified": true,
-          "themeRelationVerified": false
+          "name": "跨境通",
+          "change": 9.97,
+          "constituentVerified": true
         }
       ],
-      "signal": "资金分43、强度分34、扩散分100、持续分42、龙头分53",
-      "action": "暂不下结论，等待资金、扩散和龙头形成共振",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "防御方向",
-      "driver": "弱市环境下高股息、低波动防御",
-      "attribution": "中国电信、中国移动是板块领涨代表，不构成短线龙头梯队",
-      "leaderMode": "gainers"
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅7.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 9.97,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
     },
     {
-      "id": "BK1349",
-      "name": "棉纺",
-      "rawName": "棉纺",
-      "matchedBoard": "棉纺",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 48,
-      "phase": "观察",
-      "confirmed": false,
-      "change": 0.14,
-      "netIn": 1.6819904,
-      "mainNetRatio": 0,
-      "breadth": 0.3333333333333333,
-      "leaderName": "孚日股份",
-      "leaderChange": 0.14,
+      "id": "BK0891",
+      "rawName": "国产芯片",
+      "matchedBoard": "国产芯片",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 2.74,
+      "netIn": 663.20789504,
+      "mainNetRatio": 10.94,
+      "breadth": 0.904,
+      "leaderName": "太极实业",
+      "leaderChange": 10.01,
       "trend": {
-        "fiveDay": 0.34218951394953123,
-        "twentyDay": 5.176614150922831,
-        "positiveDays5": 0
+        "fiveDay": 5.104355132793281,
+        "twentyDay": -18.444075153694573,
+        "positiveDays5": 2
       },
+      "name": "国产芯片",
       "components": {
-        "capital": 86,
-        "strength": 25,
-        "breadth": 33,
-        "continuity": 29,
-        "leadership": 49
+        "capital": 93,
+        "strength": 55,
+        "breadth": 90,
+        "continuity": 36,
+        "leadership": 73
       },
+      "score": 72,
+      "phase": "启动",
+      "confirmed": true,
       "leaders": [
         {
           "rank": "龙一",
-          "name": "孚日股份",
-          "constituentVerified": false,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "棉纺板块仅3涨6跌，孚日股份的涨停逻辑来自VC添加剂而非棉纺扩散，属于单股带动，不能认定为棉纺主线",
-      "action": "按VC添加剂涨价线观察孚日股份，不按棉纺主线跟踪",
-      "risk": "VC价格回落、供给恢复，或孚日股份断板而同题材无补涨时，异动逻辑失效",
-      "displayType": "行业板块",
-      "driver": "孚日股份本次异动由电解液添加剂VC涨价、中报预增驱动",
-      "attribution": "孚日股份申万行业确属棉纺，主营为家纺+新材料；本次上涨不能归因为棉纺板块",
-      "leaderMode": "single"
-    },
-    {
-      "id": "BK1521",
-      "name": "摩托车",
-      "rawName": "摩托车",
-      "matchedBoard": "摩托车",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 45,
-      "phase": "观察",
-      "confirmed": false,
-      "change": 1.11,
-      "netIn": 0.36068233,
-      "mainNetRatio": 0,
-      "breadth": 0.4444444444444444,
-      "leaderName": "涛涛车业",
-      "leaderChange": 1.11,
-      "trend": {
-        "fiveDay": 3.0428306998296017,
-        "twentyDay": 8.622277069394958,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 50,
-        "strength": 38,
-        "breadth": 44,
-        "continuity": 41,
-        "leadership": 55
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "name": "涛涛车业",
-          "constituentVerified": false,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分50、强度分38、扩散分44、持续分41、龙头分55",
-      "action": "暂不下结论，等待资金、扩散和龙头形成共振",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "个股强弱为主，板块没有形成连续涨停梯队",
-      "attribution": "涛涛车业仅作为当日板块领涨股，不标龙一",
-      "leaderMode": "single"
-    },
-    {
-      "id": "BK1573",
-      "name": "油田服务",
-      "rawName": "油田服务",
-      "matchedBoard": "油田服务",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 45,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": -2.78,
-      "netIn": 0.70675152,
-      "mainNetRatio": 0,
-      "breadth": 0.125,
-      "leaderName": "贝肯能源",
-      "leaderChange": -2.78,
-      "trend": {
-        "fiveDay": 7.480107498550881,
-        "twentyDay": 15.050836941040435,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 79,
-        "strength": 24,
-        "breadth": 13,
-        "continuity": 61,
-        "leadership": 35
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "002828",
-          "name": "贝肯能源",
-          "change": 1.06,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "002207",
-          "name": "*ST准油",
-          "change": -1.86,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分79、强度分24、扩散分13、持续分61、龙头分35",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "油价与地缘交易分歧，板块当日明显回落",
-      "attribution": "贝肯能源、*ST准油仅是相对抗跌股，不是主线龙头",
-      "leaderMode": "gainers"
-    },
-    {
-      "id": "BK1611",
-      "name": "国有大型银行Ⅲ",
-      "rawName": "国有大型银行Ⅲ",
-      "matchedBoard": "国有大型银行Ⅲ",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 41,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": 0.72,
-      "netIn": -7.11483328,
-      "mainNetRatio": 0,
-      "breadth": 1,
-      "leaderName": "交通银行",
-      "leaderChange": 0.72,
-      "trend": {
-        "fiveDay": 2.012502494704793,
-        "twentyDay": 7.803150650914548,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 7,
-        "strength": 33,
-        "breadth": 100,
-        "continuity": 37,
-        "leadership": 53
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "601328",
-          "name": "交通银行",
-          "change": 1.29,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "601288",
-          "name": "农业银行",
-          "change": 1.06,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分7、强度分33、扩散分100、持续分37、龙头分53",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "防御方向",
-      "driver": "弱市中的大行防御与流动性预期",
-      "attribution": "交通银行、农业银行是相对领涨，不使用龙一、龙二称呼",
-      "leaderMode": "gainers"
-    },
-    {
-      "id": "BK1532",
-      "name": "金属包装",
-      "rawName": "金属包装",
-      "matchedBoard": "金属包装",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 39,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": 0.43,
-      "netIn": 0.55637597,
-      "mainNetRatio": 0,
-      "breadth": 0.2857142857142857,
-      "leaderName": "中锐股份",
-      "leaderChange": 0.43,
-      "trend": {
-        "fiveDay": -1.3667221819756992,
-        "twentyDay": -11.071682282951588,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 71,
-        "strength": 24,
-        "breadth": 29,
-        "continuity": 8,
-        "leadership": 51
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "name": "中锐股份",
-          "constituentVerified": false,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分71、强度分24、扩散分29、持续分8、龙头分51",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "单股表现为主，行业扩散和持续性不足",
-      "attribution": "中锐股份仅为板块领涨股，未形成龙头梯队",
-      "leaderMode": "single"
-    },
-    {
-      "id": "BK1503",
-      "name": "果蔬加工",
-      "rawName": "果蔬加工",
-      "matchedBoard": "果蔬加工",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 38,
-      "phase": "观察",
-      "confirmed": false,
-      "change": 0.15,
-      "netIn": 0.4353139,
-      "mainNetRatio": 0,
-      "breadth": 0.4,
-      "leaderName": "安德利",
-      "leaderChange": 0.15,
-      "trend": {
-        "fiveDay": -0.849671487843362,
-        "twentyDay": -2.2343932472984718,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 57,
-        "strength": 23,
-        "breadth": 40,
-        "continuity": 18,
-        "leadership": 49
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "605198",
-          "name": "安德利",
+          "name": "太极实业",
           "change": 10.01,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "300175",
-          "name": "朗源股份",
-          "change": 1.48,
-          "constituentVerified": true,
-          "themeRelationVerified": false
+          "constituentVerified": true
         }
       ],
-      "signal": "资金分57、强度分23、扩散分40、持续分18、龙头分49",
-      "action": "暂不下结论，等待资金、扩散和龙头形成共振",
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分36，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
       "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "安德利涨停带动，板块仅2只股票上涨",
-      "attribution": "安德利、朗源股份是当日领涨排序，不等同于市场龙一、龙二",
-      "leaderMode": "gainers"
+      "leaderAvgChange": 10.01,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
     },
     {
-      "id": "BK1524",
-      "name": "汽车综合服务",
-      "rawName": "汽车综合服务",
-      "matchedBoard": "汽车综合服务",
+      "id": "BK1036",
+      "rawName": "半导体",
+      "matchedBoard": "半导体",
       "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 37,
-      "phase": "观察",
-      "confirmed": false,
-      "change": -0.29,
-      "netIn": 0.4820438,
-      "mainNetRatio": 0,
-      "breadth": 0.3333333333333333,
-      "leaderName": "阿尔特",
-      "leaderChange": -0.29,
-      "trend": {
-        "fiveDay": -0.5470972582611644,
-        "twentyDay": -12.178154044354471,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 64,
-        "strength": 20,
-        "breadth": 33,
-        "continuity": 11,
-        "leadership": 46
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "name": "阿尔特",
-          "constituentVerified": false,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分64、强度分20、扩散分33、持续分11、龙头分46",
-      "action": "暂不下结论，等待资金、扩散和龙头形成共振",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "单股表现为主，板块强度、扩散均不足",
-      "attribution": "阿尔特仅为板块领涨股，未形成龙头梯队",
-      "leaderMode": "single"
-    },
-    {
-      "id": "BK1610",
-      "name": "股份制银行Ⅲ",
-      "rawName": "股份制银行Ⅲ",
-      "matchedBoard": "股份制银行Ⅲ",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 35,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": 0.1,
-      "netIn": -4.84693136,
-      "mainNetRatio": 0,
-      "breadth": 0.5555555555555556,
-      "leaderName": "中信银行",
-      "leaderChange": 0.1,
-      "trend": {
-        "fiveDay": 2.275194795568214,
-        "twentyDay": 7.778232161482879,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 21,
-        "strength": 29,
-        "breadth": 56,
-        "continuity": 38,
-        "leadership": 49
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "601998",
-          "name": "中信银行",
-          "change": 0.79,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "600036",
-          "name": "招商银行",
-          "change": 0.75,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分21、强度分29、扩散分56、持续分38、龙头分49",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "防御方向",
-      "driver": "弱市中的银行防御与流动性预期",
-      "attribution": "中信银行、招商银行是相对领涨，不使用龙一、龙二称呼",
-      "leaderMode": "gainers"
-    },
-    {
-      "id": "BK1616",
-      "name": "白银",
-      "rawName": "白银",
-      "matchedBoard": "白银",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 35,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": -4.69,
-      "netIn": -2.44987792,
-      "mainNetRatio": 0,
-      "breadth": 0,
-      "leaderName": "盛达资源",
-      "leaderChange": -4.69,
-      "trend": {
-        "fiveDay": 15.534701436041964,
-        "twentyDay": 0.33656496386540447,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 36,
-        "strength": 40,
-        "breadth": 0,
-        "continuity": 70,
-        "leadership": 35
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "name": "盛达资源",
-          "constituentVerified": false,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分36、强度分40、扩散分0、持续分70、龙头分35",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "前期资源行情获利回吐，白银板块当日普跌",
-      "attribution": "盛达资源只是相对抗跌代表，退潮阶段不设置龙头",
-      "leaderMode": "single"
-    },
-    {
-      "id": "BK1419",
-      "name": "煤化工",
-      "rawName": "煤化工",
-      "matchedBoard": "煤化工",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 28,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": -2.25,
-      "netIn": -3.45833728,
-      "mainNetRatio": 0,
-      "breadth": 0.1,
-      "leaderName": "金牛化工",
-      "leaderChange": -2.25,
-      "trend": {
-        "fiveDay": 5.882528805735432,
-        "twentyDay": 12.945281057257496,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 29,
-        "strength": 21,
-        "breadth": 10,
-        "continuity": 54,
-        "leadership": 35
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "600722",
-          "name": "金牛化工",
-          "change": 4.86,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "600844",
-          "name": "金煤科技",
-          "change": -1.63,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分29、强度分21、扩散分10、持续分54、龙头分35",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "煤化工整体回落，金牛化工属于逆势个股表现",
-      "attribution": "金牛化工、金煤科技是当日领涨排序，不构成主线梯队",
-      "leaderMode": "gainers"
-    },
-    {
-      "id": "BK1434",
-      "name": "钾肥",
-      "rawName": "钾肥",
-      "matchedBoard": "钾肥",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 27,
-      "phase": "退潮",
-      "confirmed": false,
-      "change": -4.86,
-      "netIn": -5.1020376,
-      "mainNetRatio": 0,
-      "breadth": 0,
-      "leaderName": "盐湖股份",
-      "leaderChange": -4.86,
-      "trend": {
-        "fiveDay": 12.470382542897518,
-        "twentyDay": 7.046857807967544,
-        "positiveDays5": 0
-      },
-      "components": {
-        "capital": 14,
-        "strength": 35,
-        "breadth": 0,
-        "continuity": 69,
-        "leadership": 35
-      },
-      "leaders": [
-        {
-          "rank": "龙一",
-          "code": "000792",
-          "name": "盐湖股份",
-          "change": -2.65,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "龙二",
-          "code": "000408",
-          "name": "藏格矿业",
-          "change": -2.76,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        }
-      ],
-      "signal": "资金分14、强度分35、扩散分0、持续分69、龙头分35",
-      "action": "降低关注，等待资金和上涨家数重新恢复",
-      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
-      "displayType": "行业板块",
-      "driver": "钾肥板块整体退潮，无有效进攻梯队",
-      "attribution": "盐湖股份、藏格矿业仅为跌幅较小的成分股，不应标为龙头",
-      "leaderMode": "gainers"
-    },
-    {
-      "id": "BK0457",
-      "name": "电网设备（历史补录）",
-      "rawName": "电网设备",
-      "matchedBoard": "电网设备",
-      "boardType": "行业板块",
-      "sessionDate": "2026-07-24",
-      "score": 0,
-      "phase": "观察",
-      "confirmed": false,
-      "change": 0,
-      "netIn": 0,
-      "mainNetRatio": 0,
-      "breadth": 0,
-      "leaderName": "长缆科技",
+      "sessionDate": "2026-07-27",
+      "change": 2.2,
+      "netIn": 622.66697472,
+      "mainNetRatio": 12.73,
+      "breadth": 0.8444444444444444,
+      "leaderName": "至纯科技",
       "leaderChange": 9.99,
       "trend": {
-        "fiveDay": 0,
-        "twentyDay": 0,
-        "positiveDays5": 0,
-        "valid": false
+        "fiveDay": 7.620112720704486,
+        "twentyDay": -25.318731383491013,
+        "positiveDays5": 2
       },
+      "name": "半导体",
       "components": {
-        "capital": 0,
-        "strength": 0,
-        "breadth": 0,
-        "continuity": 0,
-        "leadership": 0
+        "capital": 93,
+        "strength": 56,
+        "breadth": 84,
+        "continuity": 43,
+        "leadership": 72
       },
+      "score": 72,
+      "phase": "启动",
+      "confirmed": true,
       "leaders": [
         {
-          "rank": "领涨一",
-          "code": "002879",
-          "name": "长缆科技",
+          "rank": "龙一",
+          "name": "至纯科技",
           "change": 9.99,
-          "consecutiveBoards": 4,
-          "constituentVerified": true,
-          "themeRelationVerified": false
-        },
-        {
-          "rank": "领涨二",
-          "code": "000533",
-          "name": "顺钠股份",
-          "change": 10.02,
-          "consecutiveBoards": 2,
-          "constituentVerified": true,
-          "themeRelationVerified": false
+          "constituentVerified": true
         }
       ],
-      "displayType": "行业板块",
-      "driver": "等待题材催化与行业归属交叉核验",
-      "attribution": "仅保留行情源行业归属，不自动解释为当天上涨原因",
-      "attributionStatus": "unverified",
-      "leaderMode": "single",
-      "signal": "盘后确认长缆科技4连板，顺钠股份、太阳电缆、汉缆股份等形成2连板梯队",
-      "action": "历史补录，不作为盘中预测；实时模型将把BK0457列为强制覆盖板块",
-      "risk": "缺少7月24日盘中首次触发时间和当时价格，不能用于证明提前识别",
-      "historyValid": false,
-      "manualReview": true
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分43，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1156",
+      "rawName": "PEEK材料概念",
+      "matchedBoard": "PEEK材料概念",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 4.64,
+      "netIn": 28.639736,
+      "mainNetRatio": 10.26,
+      "breadth": 0.9782608695652174,
+      "leaderName": "雅运股份",
+      "leaderChange": 9.98,
+      "trend": {
+        "fiveDay": 4.574866395724664,
+        "twentyDay": -15.756828938820544,
+        "positiveDays5": 3
+      },
+      "name": "PEEK材料概念",
+      "components": {
+        "capital": 73,
+        "strength": 68,
+        "breadth": 98,
+        "continuity": 41,
+        "leadership": 72
+      },
+      "score": 72,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "雅运股份",
+          "change": 9.98,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分41，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.98,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1303",
+      "rawName": "锂电池",
+      "matchedBoard": "锂电池",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 5.71,
+      "netIn": 15.53993472,
+      "mainNetRatio": 3.91,
+      "breadth": 0.9696969696969697,
+      "leaderName": "紫建电子",
+      "leaderChange": 19.99,
+      "trend": {
+        "fiveDay": 6.982763004016879,
+        "twentyDay": -13.49370073317565,
+        "positiveDays5": 3
+      },
+      "name": "锂电池",
+      "components": {
+        "capital": 58,
+        "strength": 81,
+        "breadth": 97,
+        "continuity": 47,
+        "leadership": 81
+      },
+      "score": 72,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "紫建电子",
+          "change": 19.99,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅20.0%，近5日板块涨幅7.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 19.99,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1648",
+      "rawName": "电池技术",
+      "matchedBoard": "电池技术",
+      "boardType": "概念板块",
+      "sessionDate": "2026-07-27",
+      "change": 3.69,
+      "netIn": 109.41926656,
+      "mainNetRatio": 3.68,
+      "breadth": 0.9655172413793104,
+      "leaderName": "圣阳股份",
+      "leaderChange": 9.97,
+      "trend": {
+        "fiveDay": 5.180050549285542,
+        "twentyDay": -14.253072882133932,
+        "positiveDays5": 3
+      },
+      "name": "电池技术",
+      "components": {
+        "capital": 75,
+        "strength": 62,
+        "breadth": 97,
+        "continuity": 42,
+        "leadership": 72
+      },
+      "score": 71,
+      "phase": "启动",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "圣阳股份",
+          "change": 9.97,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，资金、当日强度开始共振；持续性分42，尚未达到加速标准",
+      "action": "加入重点观察，确认下一次刷新仍有资金承接",
+      "risk": "资金转为持续流出、上涨家数明显收缩，或龙头跌破承接时，该判断失效",
+      "leaderAvgChange": 9.97,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
+    },
+    {
+      "id": "BK1229",
+      "rawName": "地面兵装Ⅱ",
+      "matchedBoard": "地面兵装Ⅱ",
+      "boardType": "行业板块",
+      "sessionDate": "2026-07-27",
+      "change": 2.9,
+      "netIn": 2.07674128,
+      "mainNetRatio": 2.97,
+      "breadth": 0.9166666666666666,
+      "leaderName": "长城军工",
+      "leaderChange": 10.02,
+      "trend": {
+        "fiveDay": 13.998246427011685,
+        "twentyDay": 0.825895555614542,
+        "positiveDays5": 5
+      },
+      "name": "地面兵装Ⅱ",
+      "components": {
+        "capital": 48,
+        "strength": 75,
+        "breadth": 92,
+        "continuity": 83,
+        "leadership": 73
+      },
+      "score": 71,
+      "phase": "加速",
+      "confirmed": true,
+      "leaders": [
+        {
+          "rank": "龙一",
+          "name": "长城军工",
+          "change": 10.02,
+          "constituentVerified": true
+        }
+      ],
+      "signal": "龙头梯队尚未完整核验，核心平均涨幅10.0%，近5日板块涨幅14.0%；核心加速，仍需观察扩散",
+      "action": "强度已高，不盲目追涨，等分歧后的承接",
+      "risk": "龙一、龙二同时转弱且上涨家数未继续扩散时，加速信号失效",
+      "leaderAvgChange": 10.02,
+      "displayType": "主线题材",
+      "driver": "行情源只提供行业归属，需再与当天催化交叉核验",
+      "attribution": "未完成题材归因前，只能视为行业板块表现",
+      "leaderMode": "dragon"
     }
   ],
   "methodology": {
@@ -795,7 +1398,6 @@
       "continuity": 15,
       "leadership": 10
     },
-    "rule": "先区分静态行业归属与当天上涨题材，再用资金、强度、扩散、持续性和龙头梯队判断阶段；观察和退潮板块只标领涨股，不标龙一、龙二。"
-  },
-  "dataRevision": "historical-replay-2026-07-24"
+    "rule": "先区分静态行业归属与当天上涨题材，再用资金、强度、上涨扩散、持续性和龙头梯队五项共振判断阶段；观察和退潮板块只标领涨股。"
+  }
 }
