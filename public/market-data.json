@@ -93,7 +93,15 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "宏和科技",
+          "code": "301526",
+          "name": "国际复材",
+          "change": 20,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "002080",
+          "name": "中材科技",
           "change": 10,
           "constituentVerified": true
         }
@@ -453,8 +461,16 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "002716",
           "name": "湖南白银",
           "change": 6.66,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "000506",
+          "name": "招金黄金",
+          "change": 5.65,
           "constituentVerified": true
         }
       ],
@@ -543,8 +559,16 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "贤丰控股",
-          "change": 9.98,
+          "code": "688496",
+          "name": "*ST清越",
+          "change": 20.27,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "688020",
+          "name": "方邦股份",
+          "change": 10.71,
           "constituentVerified": true
         }
       ],
@@ -948,8 +972,16 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "000506",
           "name": "招金黄金",
           "change": 5.65,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "001337",
+          "name": "四川黄金",
+          "change": 5.16,
           "constituentVerified": true
         }
       ],
@@ -1050,18 +1082,15 @@
           "rank": "龙一",
           "code": "601606",
           "name": "长城军工",
-          "change": 9.99,
-          "constituentVerified": true,
-          "themeRelationVerified": true
+          "change": 10.02,
+          "constituentVerified": true
         },
         {
           "rank": "龙二",
-          "code": "002265",
-          "name": "建设工业",
-          "change": 10.01,
-          "constituentVerified": false,
-          "themeRelationVerified": true,
-          "verificationNote": "兵装重组题材关系成立，但不是地面兵装Ⅲ成分股"
+          "code": "301357",
+          "name": "北方长龙",
+          "change": 6.14,
+          "constituentVerified": true
         }
       ],
       "signal": "长城军工、建设工业形成龙头梯队，核心平均涨幅10.0%，近5日板块涨幅14.0%；核心加速，仍需观察扩散",
@@ -1104,6 +1133,14 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "300592",
+          "name": "华凯易佰",
+          "change": 12.39,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "002640",
           "name": "跨境通",
           "change": 9.97,
           "constituentVerified": true
@@ -1194,8 +1231,16 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "至纯科技",
-          "change": 9.99,
+          "code": "688709",
+          "name": "成都华微",
+          "change": 15.88,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "000670",
+          "name": "盈方微",
+          "change": 9.31,
           "constituentVerified": true
         }
       ],
@@ -1374,8 +1419,16 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "601606",
           "name": "长城军工",
           "change": 10.02,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "301357",
+          "name": "北方长龙",
+          "change": 6.14,
           "constituentVerified": true
         }
       ],
