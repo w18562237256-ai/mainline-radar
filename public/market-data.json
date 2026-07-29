@@ -93,8 +93,16 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "600733",
           "name": "北汽蓝谷",
           "change": 9.96,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "301039",
+          "name": "中集车辆",
+          "change": 6.34,
           "constituentVerified": true
         }
       ],
@@ -183,8 +191,16 @@
       "leaders": [
         {
           "rank": "龙一",
-          "name": "一鸣食品",
-          "change": 10.03,
+          "code": "920786",
+          "name": "骑士乳业",
+          "change": 18.21,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "603696",
+          "name": "安记食品",
+          "change": 9.96,
           "constituentVerified": true
         }
       ],
@@ -1128,8 +1144,16 @@
       "leaders": [
         {
           "rank": "龙一",
+          "code": "002568",
           "name": "百润股份",
           "change": 9.99,
+          "constituentVerified": true
+        },
+        {
+          "rank": "龙二",
+          "code": "601579",
+          "name": "会稽山",
+          "change": 4.66,
           "constituentVerified": true
         }
       ],
