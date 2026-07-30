@@ -25,6 +25,15 @@ test("market scan requests each complete board universe only once", async () => 
   assert.ok(!source.includes("industryMomentumUrl"));
 });
 
+test("hierarchical Eastmoney duplicates collapse before ranking and continuity", async () => {
+  const source = await readFile(new URL("../app/api/eastmoney/route.ts", import.meta.url), "utf8");
+
+  assert.ok(source.includes("function collapseHierarchyDuplicates"));
+  assert.ok(source.includes("function isSameHierarchyQuote"));
+  assert.ok(source.includes("hierarchyDepth(right.name) - hierarchyDepth(left.name)"));
+  assert.ok(source.includes("applyHistoricalContinuity(collapseHierarchyDuplicates(normalized))"));
+});
+
 test("stock and browser refreshes are bounded and deduplicated", async () => {
   const stockSource = await readFile(new URL("../app/api/stocks/route.ts", import.meta.url), "utf8");
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
