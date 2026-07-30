@@ -25,6 +25,9 @@ const EASTMONEY_HOSTS = [
   "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
+const EASTMONEY_SCAN_BUDGET_MS = 8_000;
+const EASTMONEY_ATTEMPT_TIMEOUT_MS = 3_000;
+let preferredEastmoneyHost = EASTMONEY_HOSTS[0];
 const PRIORITY_BOARD_IDS = new Set([
   "BK0490", // 军工概念
   "BK1204", // 国防军工
@@ -283,12 +286,19 @@ async function eastmoney(path: string) {
   // the Worker connection limit and abandoning losing response bodies.
   // Fallback hosts are therefore tried sequentially: at most six upstream
   // responses remain in flight and every unusable body is explicitly closed.
-  for (const host of EASTMONEY_HOSTS) {
+  const deadline = Date.now() + EASTMONEY_SCAN_BUDGET_MS;
+  const hosts = [
+    preferredEastmoneyHost,
+    ...EASTMONEY_HOSTS.filter((host) => host !== preferredEastmoneyHost),
+  ];
+  for (const host of hosts) {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 250) break;
     try {
       const response = await fetch(`${host}${path}`, {
         headers: EASTMONEY_HEADERS,
         cf: { cacheTtl: 0 },
-        signal: AbortSignal.timeout(12_000),
+        signal: AbortSignal.timeout(Math.min(EASTMONEY_ATTEMPT_TIMEOUT_MS, remainingMs)),
       } as RequestInit & { cf: { cacheTtl: number } });
       if (!response.ok) {
         await response.body?.cancel();
@@ -296,6 +306,7 @@ async function eastmoney(path: string) {
       }
       const payload = await response.json() as { data?: { diff?: EastmoneyRow[] } };
       if (!payload.data?.diff?.length) continue;
+      preferredEastmoneyHost = host;
       return payload;
     } catch {
       // Try the next official quote node.

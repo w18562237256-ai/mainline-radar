@@ -6,7 +6,23 @@ test("Eastmoney fallback hosts do not fan out into abandoned responses", async (
   const source = await readFile(new URL("../app/api/eastmoney/route.ts", import.meta.url), "utf8");
   const helper = source.match(/async function eastmoney\(path: string\) \{[\s\S]*?\n\}/)?.[0] ?? "";
 
-  assert.ok(helper.includes("for (const host of EASTMONEY_HOSTS)"));
+  assert.ok(helper.includes("for (const host of hosts)"));
   assert.ok(helper.includes("response.body?.cancel()"));
+  assert.ok(helper.includes("deadline - Date.now()"));
+  assert.ok(helper.includes("Math.min(EASTMONEY_ATTEMPT_TIMEOUT_MS, remainingMs)"));
+  assert.ok(helper.includes("preferredEastmoneyHost = host"));
   assert.ok(!helper.includes("Promise.any"));
+});
+
+test("stock and browser refreshes are bounded and deduplicated", async () => {
+  const stockSource = await readFile(new URL("../app/api/stocks/route.ts", import.meta.url), "utf8");
+  const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.ok(stockSource.includes("STOCK_SCAN_BUDGET_MS = 6_000"));
+  assert.ok(stockSource.includes("Math.min(STOCK_ATTEMPT_TIMEOUT_MS, remainingMs)"));
+  assert.ok(stockSource.includes("preferredStockHost = host"));
+  assert.ok(pageSource.includes("if (marketInFlightRef.current) return"));
+  assert.ok(pageSource.includes("if (stocksInFlightRef.current) return"));
+  assert.ok(pageSource.includes("signal: AbortSignal.timeout(12_000)"));
+  assert.ok(pageSource.includes("signal: AbortSignal.timeout(10_000)"));
 });

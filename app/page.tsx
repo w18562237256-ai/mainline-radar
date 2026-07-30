@@ -380,6 +380,7 @@ export default function Home() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [signalEvents, setSignalEvents] = useState<SignalEvent[]>([]);
   const marketInFlightRef = useRef(false);
+  const stocksInFlightRef = useRef(false);
   const evidenceRef = useRef<HTMLElement | null>(null);
   const stockCodesRef = useRef(stockCodes);
   const lastSnapshotRef = useRef(0);
@@ -472,7 +473,10 @@ export default function Home() {
     const scrollY = window.scrollY;
     setLoading(true);
     try {
-      const response = await fetch("/api/eastmoney", { cache: "no-store" });
+      const response = await fetch("/api/eastmoney", {
+        cache: "no-store",
+        signal: AbortSignal.timeout(12_000),
+      });
       if (!response.ok) throw new Error(`行情请求失败：${response.status}`);
       const payload = await response.json() as MarketPayload;
       if (payload.indices.length) setIndices(payload.indices);
@@ -515,13 +519,18 @@ export default function Home() {
   }, [fetchHistory]);
 
   const fetchStocks = useCallback(async (codes: string[]) => {
+    if (stocksInFlightRef.current) return;
     if (!codes.length) {
       setStockQuotes([]);
       return;
     }
+    stocksInFlightRef.current = true;
     setStockLoading(true);
     try {
-      const response = await fetch(`/api/stocks?codes=${encodeURIComponent(codes.join(","))}`, { cache: "no-store" });
+      const response = await fetch(`/api/stocks?codes=${encodeURIComponent(codes.join(","))}`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(10_000),
+      });
       if (!response.ok) throw new Error("个股行情请求失败");
       const payload = await response.json() as { source?: "eastmoney" | "delayed" | "fallback"; updatedAt?: string; stocks: StockQuote[] };
       if (!payload.stocks?.length) throw new Error("个股行情为空");
@@ -531,6 +540,7 @@ export default function Home() {
     } catch {
       setStockError("东财个股行情暂时未响应，已保留自选和上一份数据，可点右侧刷新重试");
     } finally {
+      stocksInFlightRef.current = false;
       setStockLoading(false);
     }
   }, []);

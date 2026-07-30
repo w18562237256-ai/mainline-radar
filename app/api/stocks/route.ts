@@ -14,6 +14,9 @@ const EASTMONEY_HOSTS = [
   "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
+const STOCK_SCAN_BUDGET_MS = 6_000;
+const STOCK_ATTEMPT_TIMEOUT_MS = 2_500;
+let preferredStockHost = EASTMONEY_HOSTS[0];
 const stockCacheSchemaSql = `CREATE TABLE IF NOT EXISTS stock_quote_cache (
   code TEXT PRIMARY KEY,
   updated_at TEXT NOT NULL,
@@ -37,17 +40,28 @@ async function fetchStock(code: string) {
   const fields = "f43,f44,f45,f46,f47,f48,f57,f58,f137,f168,f169,f170";
   const path = `/api/qt/stock/get?invt=2&secid=${secid(code)}&ut=${EASTMONEY_UT}&fields=${fields}`;
   let row: EastmoneyStock | null = null;
-  for (const host of EASTMONEY_HOSTS) {
+  const deadline = Date.now() + STOCK_SCAN_BUDGET_MS;
+  const hosts = [
+    preferredStockHost,
+    ...EASTMONEY_HOSTS.filter((host) => host !== preferredStockHost),
+  ];
+  for (const host of hosts) {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 250) break;
     try {
       const response = await fetch(`${host}${path}`, {
         headers: EASTMONEY_HEADERS,
-        signal: AbortSignal.timeout(6_500),
+        signal: AbortSignal.timeout(Math.min(STOCK_ATTEMPT_TIMEOUT_MS, remainingMs)),
         cf: { cacheTtl: 0 },
       } as RequestInit & { cf: { cacheTtl: number } });
-      if (!response.ok) throw new Error(`Eastmoney ${response.status}`);
+      if (!response.ok) {
+        await response.body?.cancel();
+        continue;
+      }
       const json = await response.json() as { data?: EastmoneyStock | null };
-      if (!json.data?.f57) throw new Error(`No quote for ${code}`);
+      if (!json.data?.f57) continue;
       row = json.data;
+      preferredStockHost = host;
       break;
     } catch {
       // Try the next Eastmoney quote node.
