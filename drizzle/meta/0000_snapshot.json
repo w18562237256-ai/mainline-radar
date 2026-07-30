@@ -1,150 +1,57 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "545fae88-d887-4862-a44e-c99f3d6f7153",
+  "id": "a0b79f18-3a4d-45d4-89cc-80285114b491",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "signal_observations": {
-      "name": "signal_observations",
+    "daily_snapshots": {
+      "name": "daily_snapshots",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
+        "trade_date": {
+          "name": "trade_date",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
-        "observed_at": {
-          "name": "observed_at",
+        "first_captured_at": {
+          "name": "first_captured_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "observed_bucket": {
-          "name": "observed_bucket",
+        "first_payload": {
+          "name": "first_payload",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "session_date": {
-          "name": "session_date",
+        "latest_captured_at": {
+          "name": "latest_captured_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "source_mode": {
-          "name": "source_mode",
+        "latest_payload": {
+          "name": "latest_payload",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "board_id": {
-          "name": "board_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "theme_name": {
-          "name": "theme_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "phase": {
-          "name": "phase",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "score": {
-          "name": "score",
+        "sample_count": {
+          "name": "sample_count",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "leader_one_code": {
-          "name": "leader_one_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_one_name": {
-          "name": "leader_one_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_one_change_bps": {
-          "name": "leader_one_change_bps",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_code": {
-          "name": "leader_two_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_name": {
-          "name": "leader_two_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_change_bps": {
-          "name": "leader_two_change_bps",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "payload": {
-          "name": "payload",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 1
         }
       },
-      "indexes": {
-        "signal_observation_bucket_board_uq": {
-          "name": "signal_observation_bucket_board_uq",
-          "columns": [
-            "observed_bucket",
-            "board_id"
-          ],
-          "isUnique": true
-        },
-        "signal_observation_time_idx": {
-          "name": "signal_observation_time_idx",
-          "columns": [
-            "observed_at"
-          ],
-          "isUnique": false
-        },
-        "signal_observation_board_idx": {
-          "name": "signal_observation_board_idx",
-          "columns": [
-            "board_id",
-            "observed_at"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

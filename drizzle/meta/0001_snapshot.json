@@ -1,70 +1,109 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0357f2d1-d237-4637-910e-b46f6185b18a",
-  "prevId": "545fae88-d887-4862-a44e-c99f3d6f7153",
+  "id": "fe5262a9-3cfe-46b2-b7d3-e51d6e03e6ce",
+  "prevId": "a0b79f18-3a4d-45d4-89cc-80285114b491",
   "tables": {
-    "signal_observations": {
-      "name": "signal_observations",
+    "daily_snapshots": {
+      "name": "daily_snapshots",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
+        "trade_date": {
+          "name": "trade_date",
+          "type": "text",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
-        "observed_at": {
-          "name": "observed_at",
+        "first_captured_at": {
+          "name": "first_captured_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "observed_bucket": {
-          "name": "observed_bucket",
+        "first_payload": {
+          "name": "first_payload",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "capture_window": {
-          "name": "capture_window",
+        "latest_captured_at": {
+          "name": "latest_captured_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "session_date": {
-          "name": "session_date",
+        "latest_payload": {
+          "name": "latest_payload",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "source_mode": {
-          "name": "source_mode",
+        "sample_count": {
+          "name": "sample_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "signal_events": {
+      "name": "signal_events",
+      "columns": {
+        "event_key": {
+          "name": "event_key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "trade_date": {
+          "name": "trade_date",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "board_id": {
-          "name": "board_id",
+        "triggered_at": {
+          "name": "triggered_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "theme_name": {
-          "name": "theme_name",
+        "signal_type": {
+          "name": "signal_type",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "phase": {
-          "name": "phase",
+        "stock_code": {
+          "name": "stock_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stock_name": {
+          "name": "stock_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sector_name": {
+          "name": "sector_name",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -77,46 +116,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "leader_one_code": {
-          "name": "leader_one_code",
+        "summary": {
+          "name": "summary",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_one_name": {
-          "name": "leader_one_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_one_change_bps": {
-          "name": "leader_one_change_bps",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_code": {
-          "name": "leader_two_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_name": {
-          "name": "leader_two_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "leader_two_change_bps": {
-          "name": "leader_two_change_bps",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "payload": {
@@ -127,31 +131,7 @@
           "autoincrement": false
         }
       },
-      "indexes": {
-        "signal_observation_bucket_board_uq": {
-          "name": "signal_observation_bucket_board_uq",
-          "columns": [
-            "observed_bucket",
-            "board_id"
-          ],
-          "isUnique": true
-        },
-        "signal_observation_time_idx": {
-          "name": "signal_observation_time_idx",
-          "columns": [
-            "observed_at"
-          ],
-          "isUnique": false
-        },
-        "signal_observation_board_idx": {
-          "name": "signal_observation_board_idx",
-          "columns": [
-            "board_id",
-            "observed_at"
-          ],
-          "isUnique": false
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
