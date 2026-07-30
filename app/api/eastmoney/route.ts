@@ -25,8 +25,8 @@ const EASTMONEY_HOSTS = [
   "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
-const EASTMONEY_SCAN_BUDGET_MS = 8_000;
-const EASTMONEY_ATTEMPT_TIMEOUT_MS = 3_000;
+const EASTMONEY_SCAN_BUDGET_MS = 6_000;
+const EASTMONEY_ATTEMPT_TIMEOUT_MS = 2_500;
 let preferredEastmoneyHost = EASTMONEY_HOSTS[0];
 const PRIORITY_BOARD_IDS = new Set([
   "BK0490", // 军工概念
@@ -281,10 +281,10 @@ async function applyHistoricalContinuity(sectors: NormalizedSector[]) {
 }
 
 async function eastmoney(path: string) {
-  // Six market dimensions are fetched in parallel below. Racing each one
-  // across five hosts created up to 30 simultaneous subrequests, exceeding
-  // the Worker connection limit and abandoning losing response bodies.
-  // Fallback hosts are therefore tried sequentially: at most six upstream
+  // Four market dimensions are fetched in parallel below. Racing each one
+  // across five hosts created too many simultaneous subrequests and abandoned
+  // losing response bodies. Fallback hosts are therefore tried sequentially:
+  // at most four upstream
   // responses remain in flight and every unusable body is explicitly closed.
   const deadline = Date.now() + EASTMONEY_SCAN_BUDGET_MS;
   const hosts = [
@@ -334,21 +334,17 @@ export async function GET() {
     const indexUrl = `/api/qt/ulist.np/get?fltt=2&invt=2&ut=${EASTMONEY_UT}&fields=f12%2Cf14%2Cf2%2Cf3%2Cf4%2Cf6&secids=1.000001%2C0.399001`;
     const boardFields = "f12%2Cf14%2Cf2%2Cf3%2Cf62%2Cf104%2Cf105%2Cf128%2Cf136";
     const conceptFlowUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f62&fs=m%3A90%2Bt%3A3&fields=${boardFields}`;
-    const conceptMomentumUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f3&fs=m%3A90%2Bt%3A3&fields=${boardFields}`;
     const industryFlowUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f62&fs=m%3A90%2Bt%3A2&fields=${boardFields}`;
-    const industryMomentumUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f3&fs=m%3A90%2Bt%3A2&fields=${boardFields}`;
     const priorityUrl = `/api/qt/ulist.np/get?fltt=2&invt=2&ut=${EASTMONEY_UT}&fields=${boardFields}&secids=${[...PRIORITY_BOARD_IDS].map((id) => `90.${id}`).join("%2C")}`;
     const results = await Promise.allSettled([
       eastmoney(indexUrl),
       eastmoney(conceptFlowUrl),
-      eastmoney(conceptMomentumUrl),
       eastmoney(industryFlowUrl),
-      eastmoney(industryMomentumUrl),
       eastmoney(priorityUrl),
     ]);
     const payloads = results.map((result) => result.status === "fulfilled" ? result.value : {});
     const [indexJson, ...boardPayloads] = payloads;
-    const broadResults = results.slice(1, 5);
+    const broadResults = results.slice(1, 3);
     const broadSourcesReady = broadResults.filter((result) => result.status === "fulfilled").length;
 
     const indices = (indexJson.data?.diff || []).map((row) => ({
@@ -381,7 +377,7 @@ export async function GET() {
     // Fail closed so six hand-picked boards can never masquerade as a complete
     // mainline ranking or be written into the historical audit sample.
     if (indices.length < 2 || broadSourcesReady < 2 || ranked.length < 50) {
-      throw new Error(`Eastmoney scan incomplete: ${ranked.length} boards from ${broadSourcesReady}/4 broad sources`);
+      throw new Error(`Eastmoney scan incomplete: ${ranked.length} boards from ${broadSourcesReady}/2 broad universes`);
     }
     if (!unique.length) throw new Error("Eastmoney sector payload is empty");
 
@@ -396,7 +392,7 @@ export async function GET() {
       scanCoverage: {
         fetchedBoards: ranked.length,
         broadSourcesReady,
-        broadSourcesExpected: 4,
+        broadSourcesExpected: 2,
         retainedPriorityBoards: retained.map((sector) => sector.id),
         dimensions: ["资金净流入", "板块涨幅"],
       },
