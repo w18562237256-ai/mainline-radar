@@ -475,7 +475,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/eastmoney", {
         cache: "no-store",
-        signal: AbortSignal.timeout(12_000),
+        // The server may need to rotate through official quote nodes during
+        // volatile sessions. Do not cancel that recovery path from the browser
+        // before the server-wide scan budget has elapsed.
+        signal: AbortSignal.timeout(18_000),
       });
       if (!response.ok) throw new Error(`行情请求失败：${response.status}`);
       const payload = await response.json() as MarketPayload;
