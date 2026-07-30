@@ -42,6 +42,7 @@ const PRIORITY_BOARD_IDS = new Set([
 const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普概念|富时罗素|MSCI中国|昨日涨停|昨日连板)$/;
 const STYLE_BOARD_NAME = /^(微盘股|小盘股|中盘股|大盘股|低价股|高价股|百元股|超跌股|破发股|破净股|破增发价股|超级品牌|消费风格)$/;
 const HOLDING_BOARD_NAME = /^(证金持股)$/;
+const HIERARCHY_SUFFIX = /([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+)$/;
 
 const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 const number = (value: unknown) => typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -219,6 +220,40 @@ function normalizeSector(row: EastmoneyRow, index: number) {
 
 type NormalizedSector = ReturnType<typeof normalizeSector>;
 
+function hierarchyDepth(name: string) {
+  const suffix = name.match(HIERARCHY_SUFFIX)?.[1] ?? "";
+  return [...suffix].reduce((depth, character) => {
+    const value = "ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ".indexOf(character) + 1;
+    return depth + Math.max(value, 0);
+  }, 0);
+}
+
+function isSameHierarchyQuote(left: NormalizedSector, right: NormalizedSector) {
+  return left.category === right.category
+    && left.leader === right.leader
+    && Math.abs(left.change - right.change) < 0.005
+    && Math.abs(left.flow - right.flow) < 0.005
+    && left.breadth === right.breadth
+    && left.leaderChange === right.leaderChange;
+}
+
+// Eastmoney occasionally returns the same constituents through multiple
+// industry-hierarchy levels (for example “白酒Ⅱ/白酒Ⅲ”). Their board codes
+// differ, so code-only de-duplication lets one market move occupy several
+// mainline slots. Keep a single, most granular representation before history,
+// ranking, continuity and signal gates are evaluated.
+function collapseHierarchyDuplicates(sectors: NormalizedSector[]) {
+  const ordered = [...sectors].sort((left, right) => {
+    const priorityGap = Number(PRIORITY_BOARD_IDS.has(right.id)) - Number(PRIORITY_BOARD_IDS.has(left.id));
+    return priorityGap || hierarchyDepth(right.name) - hierarchyDepth(left.name) || left.name.localeCompare(right.name, "zh-CN");
+  });
+  const retained: NormalizedSector[] = [];
+  for (const sector of ordered) {
+    if (!retained.some((candidate) => isSameHierarchyQuote(candidate, sector))) retained.push(sector);
+  }
+  return retained;
+}
+
 async function applyHistoricalContinuity(sectors: NormalizedSector[]) {
   const currentDate = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Shanghai",
@@ -365,7 +400,7 @@ export async function GET() {
       // not investable industry/theme mainlines. Excluding them prevents a
       // huge constituent count from crowding out concentrated sector moves.
       .filter((sector) => !META_BOARD_NAME.test(sector.name));
-    const ranked = (await applyHistoricalContinuity(normalized))
+    const ranked = (await applyHistoricalContinuity(collapseHierarchyDuplicates(normalized)))
       // “结构分高”不等于“主线成立”。资金、扩散硬门槛必须先于
       // 分数排序，避免少数股暴涨或负流入板块占据主线首位。
       .sort((a, b) => {
