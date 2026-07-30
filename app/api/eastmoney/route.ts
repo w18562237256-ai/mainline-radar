@@ -25,8 +25,11 @@ const EASTMONEY_HOSTS = [
   "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
-const EASTMONEY_SCAN_BUDGET_MS = 6_000;
-const EASTMONEY_ATTEMPT_TIMEOUT_MS = 2_500;
+// Board scans remain deduplicated, but a full-market ranking needs enough
+// time to retry a temporarily slow official quote node before falling back to
+// an old snapshot. The browser waits longer than this budget below.
+const EASTMONEY_SCAN_BUDGET_MS = 12_000;
+const EASTMONEY_ATTEMPT_TIMEOUT_MS = 4_000;
 let preferredEastmoneyHost = EASTMONEY_HOSTS[0];
 const PRIORITY_BOARD_IDS = new Set([
   "BK0490", // 军工概念
