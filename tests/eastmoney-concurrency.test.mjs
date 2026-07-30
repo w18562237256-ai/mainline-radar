@@ -17,8 +17,8 @@ test("Eastmoney fallback hosts do not fan out into abandoned responses", async (
 test("market scan requests each complete board universe only once", async () => {
   const source = await readFile(new URL("../app/api/eastmoney/route.ts", import.meta.url), "utf8");
 
-  assert.ok(source.includes("EASTMONEY_SCAN_BUDGET_MS = 6_000"));
-  assert.ok(source.includes("EASTMONEY_ATTEMPT_TIMEOUT_MS = 2_500"));
+  assert.ok(source.includes("EASTMONEY_SCAN_BUDGET_MS = 12_000"));
+  assert.ok(source.includes("EASTMONEY_ATTEMPT_TIMEOUT_MS = 4_000"));
   assert.ok(source.includes("const broadResults = results.slice(1, 3)"));
   assert.ok(source.includes("broadSourcesExpected: 2"));
   assert.ok(!source.includes("conceptMomentumUrl"));
@@ -34,6 +34,6 @@ test("stock and browser refreshes are bounded and deduplicated", async () => {
   assert.ok(stockSource.includes("preferredStockHost = host"));
   assert.ok(pageSource.includes("if (marketInFlightRef.current) return"));
   assert.ok(pageSource.includes("if (stocksInFlightRef.current) return"));
-  assert.ok(pageSource.includes("signal: AbortSignal.timeout(12_000)"));
+  assert.ok(pageSource.includes("signal: AbortSignal.timeout(18_000)"));
   assert.ok(pageSource.includes("signal: AbortSignal.timeout(10_000)"));
 });
