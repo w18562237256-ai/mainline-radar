@@ -17,7 +17,7 @@ type SignalInput = {
   eventKey: string;
   tradeDate: string;
   triggeredAt: string;
-  signalType: "early" | "add";
+  signalType: "early" | "add" | "recovery";
   stockCode: string;
   stockName: string;
   sectorName: string;
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(input.tradeDate)
       || !/^\d{6}$/.test(input.stockCode)
-      || !["early", "add"].includes(input.signalType)
+      || !["early", "add", "recovery"].includes(input.signalType)
       || !input.eventKey?.startsWith(`${input.tradeDate}:`)
       || !input.stockName?.trim()
       || !input.sectorName?.trim()
