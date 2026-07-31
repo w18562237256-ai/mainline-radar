@@ -184,6 +184,16 @@ button { color: inherit; }
   display: grid; grid-template-columns: 150px minmax(0, 1fr) auto auto; align-items: center; gap: 20px;
   border: 1px solid rgba(79, 179, 238, .28); background: linear-gradient(100deg, rgba(12, 44, 62, .5), rgba(10, 22, 18, .94));
 }
+.core-follow-alert {
+  width: min(1420px, calc(100% - 48px)); margin: 10px auto 0; padding: 18px 26px;
+  display: grid; grid-template-columns: 140px minmax(0, 1fr) auto auto; align-items: center; gap: 22px;
+  border: 1px solid rgba(105, 141, 240, .28); background: linear-gradient(100deg, rgba(20, 30, 67, .46), rgba(10, 21, 17, .94));
+}
+.core-follow-alert.signal-on { border-color: rgba(121, 158, 255, .72); box-shadow: 0 0 28px rgba(105, 141, 240, .13); }
+.core-follow-alert.signal-on .trade-alert-label i { background: #789dff; box-shadow: 0 0 13px rgba(120,157,255,.85); animation: alertPulse 1.4s ease-in-out infinite; }
+.core-follow-alert.signal-on .trade-alert-main strong { color: #a7c0ff; }
+.core-follow-alert > button { border: 1px solid #4d629b; background: #142244; color: #d0dbff; border-radius: 7px; padding: 10px 13px; cursor: pointer; font-size: 10px; white-space: nowrap; }
+.core-follow-alert > button:hover { border-color: #789dff; color: #a7c0ff; }
 .recovery-alert.signal-on { border-color: rgba(79, 179, 238, .65); box-shadow: 0 0 28px rgba(79, 179, 238, .1); }
 .recovery-alert.signal-on .trade-alert-label i { background: #4fb3ee; box-shadow: 0 0 13px rgba(79,179,238,.85); animation: alertPulse 1.4s ease-in-out infinite; }
 .recovery-alert.signal-on .trade-alert-main strong { color: #87d3ff; }
@@ -593,7 +603,7 @@ footer { width: min(1420px, calc(100% - 48px)); margin: 0 auto; padding: 25px 0 
   .stock-hero { grid-template-columns: 1fr; }
   .stock-hero > div:first-child { grid-column: auto; }
   .trade-alert { grid-template-columns: 120px 1fr auto; }
-  .add-alert, .recovery-alert { grid-template-columns: 120px 1fr auto; }
+  .add-alert, .recovery-alert, .core-follow-alert { grid-template-columns: 120px 1fr auto; }
   .trade-alert-metrics { display: none; }
   .signal-ledger { grid-template-columns: 120px 1fr 1fr; }
   .signal-ledger article:last-child { grid-column: 2 / -1; }
@@ -610,8 +620,8 @@ footer { width: min(1420px, calc(100% - 48px)); margin: 0 auto; padding: 25px 0 
   .market-strip div { min-width: 145px; padding: 0 15px; }
   .market-strip p { display: none; }
   .trade-alert { width: calc(100% - 24px); margin-top: 12px; grid-template-columns: 1fr auto; gap: 10px; padding: 15px; }
-  .add-alert, .recovery-alert { width: calc(100% - 24px); margin-top: 8px; grid-template-columns: 1fr auto; gap: 10px; padding: 15px; }
-  .add-alert .trade-alert-label, .recovery-alert .trade-alert-label { grid-column: 1 / -1; }
+  .add-alert, .recovery-alert, .core-follow-alert { width: calc(100% - 24px); margin-top: 8px; grid-template-columns: 1fr auto; gap: 10px; padding: 15px; }
+  .add-alert .trade-alert-label, .recovery-alert .trade-alert-label, .core-follow-alert .trade-alert-label { grid-column: 1 / -1; }
   .signal-ledger { width: calc(100% - 24px); grid-template-columns: 1fr; }
   .signal-ledger article:last-child { grid-column: auto; }
   .trade-alert-label { grid-column: 1 / -1; }
