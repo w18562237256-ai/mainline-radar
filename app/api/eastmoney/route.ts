@@ -376,7 +376,7 @@ export async function GET() {
 
   try {
     const indexUrl = `/api/qt/ulist.np/get?fltt=2&invt=2&ut=${EASTMONEY_UT}&fields=f12%2Cf14%2Cf2%2Cf3%2Cf4%2Cf6&secids=1.000001%2C0.399001`;
-    const boardFields = "f12%2Cf14%2Cf2%2Cf3%2Cf62%2Cf104%2Cf105%2Cf128%2Cf136";
+    const boardFields = "f12%2Cf14%2Cf2%2Cf3%2Cf62%2Cf104%2Cf105%2Cf128%2Cf136%2Cf140";
     const conceptFlowUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f62&fs=m%3A90%2Bt%3A3&fields=${boardFields}`;
     const industryFlowUrl = `/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fltt=2&invt=2&ut=${EASTMONEY_UT}&fid=f62&fs=m%3A90%2Bt%3A2&fields=${boardFields}`;
     const priorityUrl = `/api/qt/ulist.np/get?fltt=2&invt=2&ut=${EASTMONEY_UT}&fields=${boardFields}&secids=${[...PRIORITY_BOARD_IDS].map((id) => `90.${id}`).join("%2C")}`;
