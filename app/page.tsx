@@ -756,55 +756,13 @@ export default function Home() {
     && tradePick!.sector.leaderChange >= 2
     && tradePick!.sector.leaderChange < 9.5;
   const alertSector = hasTradeSignal && tradePick ? tradePick.sector : strongest;
-  const addCandidates = displayedStocks.flatMap((stock) => {
-    const sector = effectiveSectors.find((item) =>
-      item.leader === stock.name || item.stocks.some((member) => member.code === stock.code)
-    );
-    if (!sector || stock.price <= 0 || stock.high <= stock.low) return [];
-    const recovery = (stock.price - stock.low) / (stock.high - stock.low);
-    const score = Math.round(Math.max(0, Math.min(100,
-      sector.score * .38
-      + sector.breadth * .2
-      + Math.min(90, 45 + sector.flow * 1.2) * .18
-      + Math.min(90, stock.turnover * 4) * .12
-      + recovery * 100 * .12
-    )));
-    const qualified = isTradingTime
-      && modelReady
-      && isMainlineQualified(sector)
-      && (sector.phase === "启动" || sector.phase === "分歧")
-      && sector.streak >= 2
-      && sector.breadth >= 60
-      && stock.change >= -2
-      && stock.change <= 5
-      && stock.price >= stock.open
-      && stock.flow > 0
-      && stock.turnover >= 3
-      && stock.turnover <= 18
-      && recovery >= .62
-      && score >= 70;
-    return [{ stock, sector, recovery, score, qualified }];
-  }).sort((a, b) => b.score - a.score);
-  const addPick = addCandidates.find((item) => item.qualified) ?? addCandidates[0];
-  const hasAddSignal = Boolean(addPick?.qualified);
   const tradeDateKey = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Shanghai",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   }).format(new Date(quoteTimestamp || nowMs));
-  const currentEvent = hasAddSignal && addPick
-    ? {
-        eventKey: `${tradeDateKey}:add:${addPick.stock.code}`,
-        signalType: "add" as const,
-        stockCode: addPick.stock.code,
-        stockName: addPick.stock.name,
-        sectorName: addPick.sector.name,
-        score: addPick.score,
-        summary: `${addPick.sector.name}连续确认，${addPick.stock.name}回踩后承接转强，符合小仓分批加仓观察条件。`,
-        payload: { stock: addPick.stock, sector: addPick.sector, recovery: addPick.recovery },
-      }
-    : hasTradeSignal && tradePick
+  const currentEvent = hasTradeSignal && tradePick
       ? {
           eventKey: `${tradeDateKey}:early:${tradePick.sector.id}`,
           signalType: "early" as const,
@@ -968,31 +926,6 @@ export default function Home() {
           <span><small>后续条件</small><b>换手确认</b></span>
         </div>
         <button onClick={openEvidence}>查看依据</button>
-      </section>
-
-      <section className={`add-alert ${hasAddSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
-        <div className="trade-alert-label">
-          <i />
-          <span>可加仓监测</span>
-        </div>
-        <div className="trade-alert-main">
-          <strong>{hasAddSignal && addPick
-            ? `${addPick.stock.name} 出现分批加仓观察信号`
-            : !isTradingTime
-              ? "休市中｜等待盘中回踩确认"
-              : !modelReady
-                ? "行情数据异常｜暂停加仓判断"
-                : "暂无符合条件的加仓信号"}</strong>
-          <p>{hasAddSignal && addPick
-            ? `${addPick.sector.name}已连续确认且扩散率${addPick.sector.breadth}%；${addPick.stock.name}换手${addPick.stock.turnover.toFixed(2)}%，从日内低点修复${Math.round(addPick.recovery * 100)}%，价格重新站上开盘价并有资金承接。仅适合小仓、分批，不用于下跌摊平。`
-            : "需同时满足：所属主线连续确认、板块扩散率≥60%、个股回踩后站回开盘价、资金转正、换手充分且未进入高位加速。任一条件不足都继续等待。"}</p>
-        </div>
-        <div className="trade-alert-metrics">
-          <span><small>监测个股</small><b>{addPick?.stock.name ?? "观察池"}</b></span>
-          <span><small>加仓评分</small><b>{addPick?.score ?? "—"}</b></span>
-          <span><small>记录状态</small><b>{hasAddSignal ? "已留痕" : "等待"}</b></span>
-        </div>
-        <button onClick={() => switchView("stocks")}>查看个股</button>
       </section>
 
       {signalEvents.length > 0 && (
