@@ -417,26 +417,33 @@ export async function GET() {
     const retained = ranked.filter((sector) => PRIORITY_BOARD_IDS.has(sector.id) && !top.some((item) => item.id === sector.id));
     const unique = [...top, ...retained];
 
-    // A successful priority-board request alone is not a market-wide scan.
-    // Fail closed so six hand-picked boards can never masquerade as a complete
-    // mainline ranking or be written into the historical audit sample.
-    if (indices.length < 2 || broadSourcesReady < 2 || ranked.length < 50) {
-      throw new Error(`Eastmoney scan incomplete: ${ranked.length} boards from ${broadSourcesReady}/2 broad universes`);
+    // Mainline scoring depends on the two broad board universes, not on the
+    // separate headline-index request. Eastmoney occasionally drops only the
+    // index endpoint while returning a complete board scan; rejecting those
+    // live boards would unnecessarily pause every signal. Keep the last valid
+    // index strip for display, but require both board universes and at least 50
+    // ranked boards before any live model payload can be accepted.
+    if (broadSourcesReady < 2 || ranked.length < 50) {
+      throw new Error(`Eastmoney board scan incomplete: ${ranked.length} boards from ${broadSourcesReady}/2 broad universes`);
     }
     if (!unique.length) throw new Error("Eastmoney sector payload is empty");
 
     const marketState = marketClock();
+    const resolvedIndices = indices.length >= 2
+      ? indices
+      : (cached?.payload.indices ?? []);
     const responsePayload: CachedMarket = {
       source: "eastmoney",
       updatedAt: new Date().toISOString(),
       quoteAt: marketState.quoteAt,
       marketSession: marketState.marketSession,
-      indices,
+      indices: resolvedIndices,
       sectors: unique,
       scanCoverage: {
         fetchedBoards: ranked.length,
         broadSourcesReady,
         broadSourcesExpected: 2,
+        indexSource: indices.length >= 2 ? "live" : resolvedIndices.length >= 2 ? "cached" : "unavailable",
         retainedPriorityBoards: retained.map((sector) => sector.id),
         dimensions: ["资金净流入", "板块涨幅"],
       },
@@ -455,9 +462,14 @@ export async function GET() {
     });
   } catch (error) {
     if (cached) {
+      const currentMarketState = marketClock();
       return NextResponse.json({
         ...cached.payload,
         source: "delayed" as const,
+        // marketSession describes the current exchange state. The quoteAt
+        // field intentionally remains the cached quote time so freshness and
+        // the 150-second safety gate continue to fail closed.
+        marketSession: currentMarketState.marketSession,
         cacheHit: true,
         dataAgeSeconds: cached.ageSeconds,
         error: error instanceof Error ? error.message : "Eastmoney unavailable",
