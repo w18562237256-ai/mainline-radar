@@ -39,9 +39,12 @@ const PRIORITY_BOARD_IDS = new Set([
   "BK1036", // 半导体
   "BK0917", // 半导体概念
 ]);
-const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普概念|富时罗素|MSCI中国|昨日涨停|昨日连板)$/;
-const STYLE_BOARD_NAME = /^(微盘股|小盘股|中盘股|大盘股|低价股|高价股|百元股|超跌股|破发股|破净股|破增发价股|超级品牌|消费风格)$/;
-const HOLDING_BOARD_NAME = /^(证金持股)$/;
+// Market-behaviour, valuation and holding ranges are useful context, but are
+// not investable industry chains. Keep user-requested style factors in the
+// ranking while excluding the former from mainline confirmation and leaders.
+const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普概念|富时罗素|MSCI中国|昨日.*|近期新高|百日新高|高市净率|低市净率|高股息|连续涨停|连板.*)$/;
+const STYLE_BOARD_NAME = /^(微盘股|小盘股|中盘股|大盘股|低价股|高价股|百元股|超跌股|破发股|破净股|破增发价股|超级品牌|消费风格|科技风格|大盘成长|中盘成长|小盘成长|大盘价值|中盘价值|小盘价值)$/;
+const HOLDING_BOARD_NAME = /^(证金持股|基金重仓|社保重仓|QFII重仓|陆股通重仓)$/;
 const HIERARCHY_SUFFIX = /([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+)$/;
 
 const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
@@ -169,6 +172,8 @@ function normalizeSector(row: EastmoneyRow, index: number) {
   // exist, so it must not be represented by an invented score component.
   const score = Math.round(clamp(flowScore * .38 + breadth * .27 + momentumScore * .22 + leaderScore * .13));
   const name = String(row.f14 || "未知板块");
+  const rawLeaderCode = String(row.f140 || "");
+  const leaderCode = /^\d{6}$/.test(rawLeaderCode) ? rawLeaderCode : "";
   const category = STYLE_BOARD_NAME.test(name)
     ? "风格主线"
     : HOLDING_BOARD_NAME.test(name)
@@ -196,6 +201,7 @@ function normalizeSector(row: EastmoneyRow, index: number) {
     limitUps: leaderChange >= 9.7 ? 1 : 0,
     breadth,
     leader,
+    leaderCode,
     leaderChange,
     signal: `板块${change >= 0 ? "上涨" : "下跌"}${Math.abs(change).toFixed(2)}%，主力资金${flow >= 0 ? "净流入" : "净流出"}${Math.abs(flow).toFixed(2)}亿元，上涨家数占比${breadth}%。`,
     risk: currentPhase === "加速"
@@ -211,7 +217,7 @@ function normalizeSector(row: EastmoneyRow, index: number) {
       `东财实时`,
     ],
     stocks: [
-      { name: leader, code: "领涨", role: "板块龙头", state: `${leaderChange >= 0 ? "+" : ""}${leaderChange.toFixed(2)}%` },
+      { name: leader, code: leaderCode || "领涨", role: "板块龙头", state: `${leaderChange >= 0 ? "+" : ""}${leaderChange.toFixed(2)}%` },
       { name, code: String(row.f12 || "—"), role: "板块指数", state: `${change >= 0 ? "+" : ""}${change.toFixed(2)}%` },
       { name: "上涨 / 下跌", code: `${up} / ${down}`, role: "市场宽度", state: `${breadth}%` },
     ],
