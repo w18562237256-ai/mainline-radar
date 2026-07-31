@@ -17,6 +17,7 @@ type Sector = {
   limitUps: number;
   breadth: number;
   leader: string;
+  leaderCode?: string;
   leaderChange: number;
   signal: string;
   risk: string;
@@ -77,7 +78,7 @@ type SignalEvent = {
   event_key: string;
   trade_date: string;
   triggered_at: string;
-  signal_type: "early" | "add";
+  signal_type: "early" | "add" | "recovery";
   stock_code: string;
   stock_name: string;
   sector_name: string;
@@ -707,6 +708,25 @@ export default function Home() {
     })
     .sort((a, b) => b.opportunity - a.opportunity);
   const earlyPick = earlyCandidates.find((item) => item.stage !== "已加速") ?? earlyCandidates[0];
+  // A broad first-day rebound after a washout can be valuable to record, but
+  // it is not promoted to a buy prompt without the existing two-day and
+  // leader-support confirmation. This preserves the anti-chase gate while
+  // giving the next session's review an auditable recovery candidate.
+  const recoveryCandidates = effectiveSectors
+    .filter((sector) => isMainlineQualified(sector)
+      && sector.streak === 1
+      && sector.phase === "启动"
+      && sector.score >= 80
+      && sector.change >= 3
+      && sector.flow > 0
+      && sector.breadth >= 80)
+    .map((sector) => ({
+      sector,
+      score: Math.round(Math.min(100, sector.score * .45 + sector.breadth * .25 + Math.min(90, 50 + sector.flow) * .3)),
+    }))
+    .sort((left, right) => right.score - left.score);
+  const recoveryPick = recoveryCandidates[0];
+  const hasRecoveryObservation = Boolean(recoveryPick) && isTradingTime && modelReady;
   const hasTradeSignal = Boolean(earlyPick)
     && isTradingTime
     && modelReady
@@ -770,13 +790,24 @@ export default function Home() {
       ? {
           eventKey: `${tradeDateKey}:early:${earlyPick.sector.id}`,
           signalType: "early" as const,
-          stockCode: earlyPick.sector.stocks[0]?.code || "000000",
+          stockCode: earlyPick.sector.leaderCode || "000000",
           stockName: earlyPick.sector.leader,
           sectorName: earlyPick.sector.name,
           score: earlyPick.opportunity,
           summary: `${earlyPick.sector.name}进入首次确认，${earlyPick.sector.leader}出现早期观察信号。`,
           payload: { sector: earlyPick.sector },
         }
+      : hasRecoveryObservation && recoveryPick
+        ? {
+            eventKey: `${tradeDateKey}:recovery:${recoveryPick.sector.id}`,
+            signalType: "recovery" as const,
+            stockCode: recoveryPick.sector.leaderCode || "000000",
+            stockName: recoveryPick.sector.leader,
+            sectorName: recoveryPick.sector.name,
+            score: recoveryPick.score,
+            summary: `${recoveryPick.sector.name}出现首日强修复，已留痕；龙头未完成换手与连续性确认，不构成追涨提示。`,
+            payload: { sector: recoveryPick.sector },
+          }
       : null;
 
   useEffect(() => {
@@ -900,6 +931,27 @@ export default function Home() {
         </button>
       </section>
 
+      <section className={`recovery-alert ${hasRecoveryObservation ? "signal-on" : "signal-off"}`} aria-live="polite">
+        <div className="trade-alert-label">
+          <i />
+          <span>强修复观察</span>
+        </div>
+        <div className="trade-alert-main">
+          <strong>{hasRecoveryObservation && recoveryPick
+            ? `${recoveryPick.sector.name} 出现首日强修复｜已留痕`
+            : "暂无首日强修复观察"}</strong>
+          <p>{hasRecoveryObservation && recoveryPick
+            ? `板块涨${recoveryPick.sector.change.toFixed(2)}%、资金净流入${recoveryPick.sector.flow.toFixed(2)}亿、上涨扩散率${recoveryPick.sector.breadth}%。这仅记录反转候选；若龙头已涨停或未完成换手，仍不生成买入提示，等待首次健康分歧后的承接确认。`
+            : "仅记录首日出现资金、广度与强度同步修复的方向；不替代两日连续确认，也不会在龙头封板后提示追涨。"}</p>
+        </div>
+        <div className="trade-alert-metrics">
+          <span><small>观察方向</small><b>{recoveryPick?.sector.name ?? "等待"}</b></span>
+          <span><small>修复评分</small><b>{recoveryPick?.score ?? "—"}</b></span>
+          <span><small>后续条件</small><b>换手确认</b></span>
+        </div>
+        <button onClick={openEvidence}>查看依据</button>
+      </section>
+
       <section className={`add-alert ${hasAddSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
         <div className="trade-alert-label">
           <i />
@@ -933,7 +985,7 @@ export default function Home() {
           </div>
           {signalEvents.slice(0, 3).map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "add" ? "加仓观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.stock_name} · {event.sector_name}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
