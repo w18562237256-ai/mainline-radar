@@ -727,17 +727,35 @@ export default function Home() {
     .sort((left, right) => right.score - left.score);
   const recoveryPick = recoveryCandidates[0];
   const hasRecoveryObservation = Boolean(recoveryPick) && isTradingTime && modelReady;
-  const hasTradeSignal = Boolean(earlyPick)
+  const firstConfirmedPick = earlyCandidates.find((item) =>
+    item.stage !== "已加速" && item.sector.streak === 2
+  );
+  // Restore the earlier, more responsive entry window without restoring
+  // high-chase prompts: a first-day probe needs stronger breadth and score,
+  // an advancing (not limit-up) leader, and a real sector move. The normal
+  // two-day confirmation remains the preferred path.
+  const firstDayProbePick = earlyCandidates.find((item) =>
+    item.stage === "首板观察"
+    && item.sector.streak === 1
+    && item.sector.score >= 72
+    && item.sector.change >= 1.5
+    && item.sector.breadth >= 65
+    && item.sector.flow > 0
+    && item.sector.leaderChange >= 3
+    && item.sector.leaderChange < 8.5
+    && item.opportunity >= 62
+  );
+  const tradePick = firstConfirmedPick ?? firstDayProbePick;
+  const hasTradeSignal = Boolean(tradePick)
     && isTradingTime
     && modelReady
-    && earlyPick!.stage !== "已加速"
-    && earlyPick!.opportunity >= 58
-    && earlyPick!.sector.flow > 0
-    && earlyPick!.sector.breadth >= 50
-    && earlyPick!.sector.leaderChange >= 2
-    && earlyPick!.sector.leaderChange < 9.5
-    && earlyPick!.sector.streak === 2;
-  const alertSector = hasTradeSignal && earlyPick ? earlyPick.sector : strongest;
+    && tradePick!.stage !== "已加速"
+    && tradePick!.opportunity >= 58
+    && tradePick!.sector.flow > 0
+    && tradePick!.sector.breadth >= 50
+    && tradePick!.sector.leaderChange >= 2
+    && tradePick!.sector.leaderChange < 9.5;
+  const alertSector = hasTradeSignal && tradePick ? tradePick.sector : strongest;
   const addCandidates = displayedStocks.flatMap((stock) => {
     const sector = effectiveSectors.find((item) =>
       item.leader === stock.name || item.stocks.some((member) => member.code === stock.code)
@@ -786,16 +804,16 @@ export default function Home() {
         summary: `${addPick.sector.name}连续确认，${addPick.stock.name}回踩后承接转强，符合小仓分批加仓观察条件。`,
         payload: { stock: addPick.stock, sector: addPick.sector, recovery: addPick.recovery },
       }
-    : hasTradeSignal && earlyPick
+    : hasTradeSignal && tradePick
       ? {
-          eventKey: `${tradeDateKey}:early:${earlyPick.sector.id}`,
+          eventKey: `${tradeDateKey}:early:${tradePick.sector.id}`,
           signalType: "early" as const,
-          stockCode: earlyPick.sector.leaderCode || "000000",
-          stockName: earlyPick.sector.leader,
-          sectorName: earlyPick.sector.name,
-          score: earlyPick.opportunity,
-          summary: `${earlyPick.sector.name}进入首次确认，${earlyPick.sector.leader}出现早期观察信号。`,
-          payload: { sector: earlyPick.sector },
+          stockCode: tradePick.sector.leaderCode || "000000",
+          stockName: tradePick.sector.leader,
+          sectorName: tradePick.sector.name,
+          score: tradePick.opportunity,
+          summary: `${tradePick.sector.name}${tradePick.sector.streak === 1 ? "出现首日启动" : "进入首次确认"}，${tradePick.sector.leader}出现早期观察信号。`,
+          payload: { sector: tradePick.sector },
         }
       : hasRecoveryObservation && recoveryPick
         ? {
