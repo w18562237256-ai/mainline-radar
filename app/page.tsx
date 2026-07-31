@@ -78,7 +78,7 @@ type SignalEvent = {
   event_key: string;
   trade_date: string;
   triggered_at: string;
-  signal_type: "early" | "add" | "recovery" | "core";
+  signal_type: "early" | "add" | "recovery" | "core" | "chase";
   stock_code: string;
   stock_name: string;
   sector_name: string;
@@ -803,6 +803,26 @@ export default function Home() {
     && item.sector.leaderChange < 8.5
     && item.opportunity >= 62
   );
+  // A separate high-risk lane for a genuine first-day mainline leader that
+  // has already sealed/approached the limit. It is deliberately not merged
+  // with the early-entry signal: the required breadth, flow and strength are
+  // materially higher, and it is disabled once the theme becomes a multi-day
+  // acceleration. Eastmoney does not provide intraday order-book quality, so
+  // this is a monitoring prompt, not an instruction to chase an opening spike.
+  const leaderChasePick = earlyCandidates.find((item) =>
+    item.sector.streak <= 2
+    && item.sector.phase !== "退潮"
+    && item.sector.score >= 90
+    && item.sector.change >= 3
+    && item.sector.flow >= 20
+    && item.sector.breadth >= 88
+    && item.sector.limitUps >= 1
+    && item.sector.leaderChange >= 9.5
+    && item.opportunity >= 72
+  );
+  const hasLeaderChaseSignal = Boolean(leaderChasePick)
+    && isTradingTime
+    && modelReady;
   const tradePick = firstConfirmedPick ?? firstDayProbePick;
   const hasTradeSignal = Boolean(tradePick)
     && isTradingTime
@@ -841,6 +861,17 @@ export default function Home() {
             score: coreFollowerPick.score,
             summary: `${coreFollowerPick.stock.name}在${coreFollowerPick.sector.name}主线内由低开/平开转强，板块扩散与资金承接同步；仅作小仓试错观察，涨幅接近8.5%即失效。`,
             payload: { stock: coreFollowerPick.stock, sector: coreFollowerPick.sector, openChange: coreFollowerPick.openChange, reboundFromLow: coreFollowerPick.reboundFromLow },
+          }
+      : hasLeaderChaseSignal && leaderChasePick
+        ? {
+            eventKey: `${tradeDateKey}:chase:${leaderChasePick.sector.id}`,
+            signalType: "chase" as const,
+            stockCode: leaderChasePick.sector.leaderCode || "000000",
+            stockName: leaderChasePick.sector.leader,
+            sectorName: leaderChasePick.sector.name,
+            score: leaderChasePick.opportunity,
+            summary: `${leaderChasePick.sector.name}出现高强度龙头加速：板块资金、扩散和涨停梯队同步。仅作为高风险跟随监测，若开板回落或板块前排转弱即失效。`,
+            payload: { sector: leaderChasePick.sector },
           }
       : hasRecoveryObservation && recoveryPick
         ? {
@@ -986,6 +1017,27 @@ export default function Home() {
         </button>
       </section>
 
+      <section className={`chase-alert ${hasLeaderChaseSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
+        <div className="trade-alert-label">
+          <i />
+          <span>龙头强势追高监测</span>
+        </div>
+        <div className="trade-alert-main">
+          <strong>{hasLeaderChaseSignal && leaderChasePick
+            ? `${leaderChasePick.sector.leader} 强势追高观察｜${leaderChasePick.sector.name}`
+            : "暂无满足条件的龙头追高监测"}</strong>
+          <p>{hasLeaderChaseSignal && leaderChasePick
+            ? `板块涨${leaderChasePick.sector.change.toFixed(2)}%、资金净流入${leaderChasePick.sector.flow.toFixed(2)}亿、上涨扩散率${leaderChasePick.sector.breadth}%、涨停梯队${leaderChasePick.sector.limitUps}只。仅适用于已确认的首日/两日主线强龙头；开板回落、板块前排转弱或进入连续加速后立即失效。`
+            : "只监测首日或两日主线中，资金、扩散、涨停梯队同时极强的龙头；不在退潮方向、连续多日加速或单股独涨时提示。"}</p>
+        </div>
+        <div className="trade-alert-metrics">
+          <span><small>龙头</small><b>{leaderChasePick?.sector.leader ?? "等待"}</b></span>
+          <span><small>机会分</small><b>{leaderChasePick?.opportunity ?? "—"}</b></span>
+          <span><small>风险等级</small><b>高</b></span>
+        </div>
+        <button onClick={openEvidence}>查看依据</button>
+      </section>
+
       <section className={`core-follow-alert ${hasCoreFollowerSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
         <div className="trade-alert-label">
           <i />
@@ -1036,7 +1088,7 @@ export default function Home() {
           </div>
           {signalEvents.slice(0, 3).map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "core" ? "核心弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.stock_name} · {event.sector_name}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
