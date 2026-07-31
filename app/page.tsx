@@ -91,6 +91,11 @@ const isMainlineQualified = (sector: Sector) =>
   && sector.flow > 0
   && sector.breadth >= 50;
 
+// Signals may use a complete quote for up to 2 minutes 30 seconds. Longer
+// interruptions still fail closed so a stale board scan can never create a
+// buy or add-position prompt.
+const SIGNAL_FRESHNESS_SECONDS = 150;
+
 type View = "mainline" | "funds" | "stocks";
 
 type StockQuote = {
@@ -403,8 +408,8 @@ export default function Home() {
     ? Math.max(0, Math.floor((nowMs - updatedAtMs) / 1000))
     : Number.MAX_SAFE_INTEGER;
   const hasDisplayData = source !== "fallback" && sectorData.length > 0;
-  const modelReady = hasDisplayData && dataAgeSeconds <= 120 && isTradingTime;
-  const auctionReady = hasDisplayData && dataAgeSeconds <= 120 && isAuctionWindow;
+  const modelReady = hasDisplayData && dataAgeSeconds <= SIGNAL_FRESHNESS_SECONDS && isTradingTime;
+  const auctionReady = hasDisplayData && dataAgeSeconds <= SIGNAL_FRESHNESS_SECONDS && isAuctionWindow;
   const quoteTimestamp = quoteAt || updatedAt;
   const quoteTradeDate = formatTradeDate(quoteTimestamp);
   const currentTradeDate = formatTradeDate(new Date(nowMs).toISOString());
@@ -503,7 +508,7 @@ export default function Home() {
         (marketMinute >= 780 && marketMinute <= 900)
       );
       const payloadAge = payload.dataAgeSeconds ?? Math.max(0, Math.floor((Date.now() - new Date(payload.updatedAt).getTime()) / 1000));
-      if (canSnapshot && payload.source === "eastmoney" && payloadAge <= 120 && payload.sectors.length && Date.now() - lastSnapshotRef.current > 5 * 60_000) {
+      if (canSnapshot && payload.source === "eastmoney" && payloadAge <= SIGNAL_FRESHNESS_SECONDS && payload.sectors.length && Date.now() - lastSnapshotRef.current > 5 * 60_000) {
         lastSnapshotRef.current = Date.now();
         void fetch("/api/history", {
           method: "POST",
@@ -879,7 +884,7 @@ export default function Home() {
                 ? `最近识别主线：${strongest.name}；已确认龙头：${strongest.leader}。休市期间不生成买入信号，开盘后优先寻找尚未加速的新候选。`
               : !modelReady
                 ? hasDisplayData
-                  ? `当前展示最后一次有效行情，数据已延迟${delayLabel}；超过2分钟后模型不会触发买入提示。`
+                  ? `当前展示最后一次有效行情，数据已延迟${delayLabel}；超过2分30秒后模型不会触发买入提示。`
                   : "尚未取得有效实时行情；主线、龙头和买点模型均已暂停。"
                 : earlyPick?.stage === "已加速"
                   ? `${strongest.name}已进入加速阶段，继续追涨的赔率下降。系统将优先寻找首日流入、刚扩散、龙头尚未涨停的新方向。`
@@ -1009,7 +1014,7 @@ export default function Home() {
           <div className="hero-copy">
             <div className="eyebrow"><span>市场结论</span> {closeReviewReady ? "收盘结构复盘" : lunchReviewReady ? "午间结构复盘" : analysisReady ? "实时结构分析" : "行情异常 · 模型暂停"}</div>
             <h1>{analysisReady ? <>{strongest.name}领先，<br /><b>{newest.name}进入启动窗口</b></> : <>实时数据不完整，<br /><b>不生成主线与龙头判断</b></>}</h1>
-            <p>监测台每20秒更新板块资金、涨跌幅、上涨家数与领涨股；个股行情每20秒更新。行情中断时保留最后一次有效数据，超过2分钟自动暂停买点模型。</p>
+            <p>监测台每20秒更新板块资金、涨跌幅、上涨家数与领涨股；个股行情每20秒更新。行情中断时保留最后一次有效数据，超过2分30秒自动暂停买点模型。</p>
           </div>
           <div className="radar-score">
             <div className="score-ring">
