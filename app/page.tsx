@@ -78,7 +78,7 @@ type SignalEvent = {
   event_key: string;
   trade_date: string;
   triggered_at: string;
-  signal_type: "early" | "add" | "recovery";
+  signal_type: "early" | "add" | "recovery" | "core";
   stock_code: string;
   stock_name: string;
   sector_name: string;
@@ -96,6 +96,23 @@ const isMainlineQualified = (sector: Sector) =>
 // interruptions still fail closed so a stale board scan can never create a
 // buy or add-position prompt.
 const SIGNAL_FRESHNESS_SECONDS = 150;
+
+// Eastmoney's board list returns only one leading stock per theme. These are
+// liquid, widely followed AI application cores that often confirm a broad
+// theme after the named board leader has already accelerated. Keep this list
+// intentionally small until there is enough review data to expand it.
+const CORE_FOLLOWER_UNIVERSE = [
+  {
+    code: "300364",
+    name: "中文在线",
+    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体", "互联网服务", "计算机", "软件开发", "信创"],
+  },
+  {
+    code: "300058",
+    name: "蓝色光标",
+    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体", "互联网服务", "计算机", "软件开发", "信创"],
+  },
+] as const;
 
 type View = "mainline" | "funds" | "stocks";
 
@@ -374,7 +391,7 @@ export default function Home() {
   const [quoteAt, setQuoteAt] = useState("");
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [secondsLeft, setSecondsLeft] = useState(20);
-  const [stockCodes, setStockCodes] = useState<string[]>(["002980", "601606", "002265", "301392"]);
+  const [stockCodes, setStockCodes] = useState<string[]>(["002980", "601606", "002265", "301392", ...CORE_FOLLOWER_UNIVERSE.map((item) => item.code)]);
   const [stockQuotes, setStockQuotes] = useState<StockQuote[]>([]);
   const [stockInput, setStockInput] = useState("");
   const [stockError, setStockError] = useState("");
@@ -573,9 +590,10 @@ export default function Home() {
       try {
         const parsed = JSON.parse(storedStocks);
         if (Array.isArray(parsed)) {
-          initialStocks = parsed;
-          setStockCodes(parsed);
-          stockCodesRef.current = parsed;
+          initialStocks = [...new Set([...parsed, ...CORE_FOLLOWER_UNIVERSE.map((item) => item.code)])];
+          setStockCodes(initialStocks);
+          stockCodesRef.current = initialStocks;
+          window.localStorage.setItem("mainline-stock-codes", JSON.stringify(initialStocks));
         }
       } catch { /* keep defaults */ }
     }
@@ -682,6 +700,46 @@ export default function Home() {
     turnover: 0,
     flow: 0,
   });
+  const coreFollowerCandidates = CORE_FOLLOWER_UNIVERSE.flatMap((core) => {
+    const stock = stockQuotes.find((item) => item.code === core.code);
+    if (!stock?.price || !stock.low || !stock.open) return [];
+    const priorClose = stock.price - stock.changeValue;
+    if (priorClose <= 0) return [];
+    const openChange = (stock.open / priorClose - 1) * 100;
+    const reboundFromLow = (stock.price / stock.low - 1) * 100;
+    const sector = effectiveSectors
+      .filter((item) => core.sectorNames.includes(item.name)
+        && isMainlineQualified(item)
+        && item.score >= 75
+        && item.change >= 2
+        && item.breadth >= 70)
+      .sort((left, right) => right.score - left.score || right.flow - left.flow)[0];
+    if (!sector) return [];
+    // This intentionally catches a low/flat-open stock turning active while
+    // its theme is already broad and funded. It does not buy a stock merely
+    // because it is green: liquidity, turnover, intraday rebound and a
+    // sub-limit price are all required.
+    const qualifies = stock.change >= 2
+      && stock.change < 8.5
+      && openChange <= 2.5
+      && stock.price > stock.open
+      && reboundFromLow >= 2.2
+      && stock.amount >= 300_000_000
+      && stock.turnover >= 3
+      && stock.flow > 0;
+    if (!qualifies) return [];
+    const score = Math.round(Math.min(100,
+      sector.score * .35
+      + sector.breadth * .2
+      + Math.min(95, 50 + sector.flow) * .15
+      + Math.min(85, stock.change * 7) * .15
+      + Math.min(90, reboundFromLow * 18) * .1
+      + Math.min(75, stock.turnover * 3) * .05
+    ));
+    return [{ stock, sector, score, openChange, reboundFromLow }];
+  }).sort((left, right) => right.score - left.score || right.stock.amount - left.stock.amount);
+  const coreFollowerPick = coreFollowerCandidates[0];
+  const hasCoreFollowerSignal = Boolean(coreFollowerPick) && isTradingTime && modelReady;
   const checks = confirmationChecks(selected);
   const passedChecks = checks.filter((item) => item.status === "pass").length;
   const earlyCandidates = effectiveSectors
@@ -773,6 +831,17 @@ export default function Home() {
           summary: `${tradePick.sector.name}${tradePick.sector.streak === 1 ? "出现首日启动" : "进入首次确认"}，${tradePick.sector.leader}出现早期观察信号。`,
           payload: { sector: tradePick.sector },
         }
+      : hasCoreFollowerSignal && coreFollowerPick
+        ? {
+            eventKey: `${tradeDateKey}:core:${coreFollowerPick.stock.code}`,
+            signalType: "core" as const,
+            stockCode: coreFollowerPick.stock.code,
+            stockName: coreFollowerPick.stock.name,
+            sectorName: coreFollowerPick.sector.name,
+            score: coreFollowerPick.score,
+            summary: `${coreFollowerPick.stock.name}在${coreFollowerPick.sector.name}主线内由低开/平开转强，板块扩散与资金承接同步；仅作小仓试错观察，涨幅接近8.5%即失效。`,
+            payload: { stock: coreFollowerPick.stock, sector: coreFollowerPick.sector, openChange: coreFollowerPick.openChange, reboundFromLow: coreFollowerPick.reboundFromLow },
+          }
       : hasRecoveryObservation && recoveryPick
         ? {
             eventKey: `${tradeDateKey}:recovery:${recoveryPick.sector.id}`,
@@ -811,6 +880,16 @@ export default function Home() {
     ?? latestHistoryPayload?.sectors?.[0];
   const openEvidence = () => {
     setSelectedId(alertSector.id);
+    switchView("mainline");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        evidenceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        evidenceRef.current?.focus({ preventScroll: true });
+      });
+    });
+  };
+  const openCoreEvidence = () => {
+    if (coreFollowerPick) setSelectedId(coreFollowerPick.sector.id);
     switchView("mainline");
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -907,6 +986,27 @@ export default function Home() {
         </button>
       </section>
 
+      <section className={`core-follow-alert ${hasCoreFollowerSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
+        <div className="trade-alert-label">
+          <i />
+          <span>主线核心弱转强</span>
+        </div>
+        <div className="trade-alert-main">
+          <strong>{hasCoreFollowerSignal && coreFollowerPick
+            ? `${coreFollowerPick.stock.name} 弱转强观察｜${coreFollowerPick.sector.name}`
+            : "暂无主线核心弱转强信号"}</strong>
+          <p>{hasCoreFollowerSignal && coreFollowerPick
+            ? `涨幅${coreFollowerPick.stock.change.toFixed(2)}%，较日内低点回升${coreFollowerPick.reboundFromLow.toFixed(2)}%，成交${(coreFollowerPick.stock.amount / 100_000_000).toFixed(2)}亿、换手${coreFollowerPick.stock.turnover.toFixed(2)}%。板块资金与扩散同步，但只在涨幅低于8.5%时保留小仓试错参考。`
+            : "仅监测已纳入核心池、且属于当日资金主线的跟涨股：需低开/平开后转强、成交与换手放大、资金为正，并在接近涨停前触发。"}</p>
+        </div>
+        <div className="trade-alert-metrics">
+          <span><small>核心股</small><b>{coreFollowerPick?.stock.name ?? "等待"}</b></span>
+          <span><small>机会分</small><b>{coreFollowerPick?.score ?? "—"}</b></span>
+          <span><small>风险位</small><b>{coreFollowerPick ? `${coreFollowerPick.stock.low.toFixed(2)}` : "日内低点"}</b></span>
+        </div>
+        <button onClick={openCoreEvidence}>查看板块</button>
+      </section>
+
       <section className={`recovery-alert ${hasRecoveryObservation ? "signal-on" : "signal-off"}`} aria-live="polite">
         <div className="trade-alert-label">
           <i />
@@ -936,7 +1036,7 @@ export default function Home() {
           </div>
           {signalEvents.slice(0, 3).map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "core" ? "核心弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.stock_name} · {event.sector_name}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
