@@ -904,6 +904,15 @@ export default function Home() {
       }),
     }).then(() => fetchSignals()).catch(() => undefined);
   }, [currentEvent, fetchSignals, quoteTimestamp, tradeDateKey]);
+  // Keep the day's early-entry records visible even when later recovery
+  // observations arrive. A recovery is useful context, but it must not push
+  // the earlier research record out of the short ledger.
+  const sameSessionSignalEvents = signalEvents.filter((event) => event.trade_date === tradeDateKey);
+  const signalLedgerPool = sameSessionSignalEvents.length ? sameSessionSignalEvents : signalEvents;
+  const displayedSignalEvents = [
+    ...signalLedgerPool.filter((event) => event.signal_type !== "recovery"),
+    ...signalLedgerPool.filter((event) => event.signal_type === "recovery"),
+  ].slice(0, 6);
   const firstHistoryPayload = historySnapshot
     ? JSON.parse(historySnapshot.first_payload) as MarketPayload
     : null;
@@ -1085,15 +1094,16 @@ export default function Home() {
         <button onClick={openEvidence}>查看依据</button>
       </section>
 
-      {signalEvents.length > 0 && (
+      {displayedSignalEvents.length > 0 && (
         <section className="signal-ledger">
           <div>
             <span>信号留痕</span>
-            <strong>最近触发记录</strong>
+            <strong>当日触发记录</strong>
+            <small>候选信号优先展示；修复观察仅作复盘，不等同买入提示。</small>
           </div>
-          {signalEvents.slice(0, 3).map((event) => (
+          {displayedSignalEvents.map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点（观察）"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.signal_type === "recovery"
                 ? `${event.sector_name} · 板块修复观察`
                 : `${event.stock_name} · ${event.sector_name}`}</strong>
