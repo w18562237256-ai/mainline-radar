@@ -43,11 +43,24 @@ test("overlapping concept families collapse before mainline ranking and signals"
   assert.ok(source.includes("function collapseSemanticThemeDuplicates"));
   assert.ok(source.includes("collapseSemanticThemeDuplicates(continuityApplied)"));
   assert.ok(source.includes('key: "optical-networking"'));
+  assert.ok(source.includes('key: "printed-circuit-boards"'));
   assert.ok(source.includes('key: "ai-applications"'));
+  assert.ok(source.includes('"光纤概念"'));
+  assert.ok(source.includes('"5G概念"'));
+  assert.ok(source.includes('"通信"'));
   assert.ok(source.includes("limitUpsExact: false"));
   assert.ok(page.includes("item.sector.limitUpsExact === true"));
   assert.ok(page.includes("item.sector.limitUps >= 2"));
   assert.ok(!page.includes('"互联网服务", "计算机", "软件开发", "信创"'));
+});
+
+test("market-universe labels cannot qualify as industry mainlines", async () => {
+  const source = await readFile(new URL("../app/api/eastmoney/route.ts", import.meta.url), "utf8");
+
+  assert.ok(source.includes("创业板综"));
+  assert.ok(source.includes("创业成份"));
+  assert.ok(source.includes("东方财富热股"));
+  assert.ok(source.includes(".filter((sector) => !META_BOARD_NAME.test(sector.name))"));
 });
 
 test("signal history hides unauditable role and sector pairings", async () => {
