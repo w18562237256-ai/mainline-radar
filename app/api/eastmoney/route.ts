@@ -46,6 +46,21 @@ const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普�
 const STYLE_BOARD_NAME = /^(微盘股|小盘股|中盘股|大盘股|低价股|高价股|百元股|超跌股|破发股|破净股|破增发价股|超级品牌|消费风格|科技风格|大盘成长|中盘成长|小盘成长|大盘价值|中盘价值|小盘价值)$/;
 const HOLDING_BOARD_NAME = /^(证金持股|基金重仓|社保重仓|QFII重仓|陆股通重仓)$/;
 const HIERARCHY_SUFFIX = /([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+)$/;
+// Eastmoney exposes overlapping concept boards as independent rows. They are
+// useful for browsing, but counting every synonym as a separate mainline can
+// turn one crowded trade into dozens of apparent directions. Keep these
+// families deliberately narrow and evidence-based; unrelated upstream and
+// downstream industries (for example PCB and optical modules) stay separate.
+const SEMANTIC_THEME_FAMILIES = [
+  {
+    key: "optical-networking",
+    names: new Set(["CPO概念", "光通信模块", "光通信", "光纤", "通信网络设备及器件", "通信设备", "通信技术"]),
+  },
+  {
+    key: "ai-applications",
+    names: new Set(["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体"]),
+  },
+] as const;
 
 const clamp = (value: number, min = 0, max = 100) => Math.min(max, Math.max(min, value));
 const number = (value: unknown) => typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -199,6 +214,10 @@ function normalizeSector(row: EastmoneyRow, index: number) {
     // limit-up count. Keep only a conservative lower bound instead of
     // incorrectly reporting zero when the leader is visibly at the limit.
     limitUps: leaderChange >= 9.7 ? 1 : 0,
+    // The board quote supplies only the leading stock, so this is a lower
+    // bound rather than a complete limit-up ladder. Signal code must not treat
+    // it as exact evidence of multiple front-row stocks.
+    limitUpsExact: false,
     breadth,
     leader,
     leaderCode,
@@ -258,6 +277,33 @@ function collapseHierarchyDuplicates(sectors: NormalizedSector[]) {
     if (!retained.some((candidate) => isSameHierarchyQuote(candidate, sector))) retained.push(sector);
   }
   return retained;
+}
+
+function semanticThemeFamily(name: string) {
+  return SEMANTIC_THEME_FAMILIES.find((family) => family.names.has(name))?.key ?? `board:${name}`;
+}
+
+// Collapse only the model universe. Scan coverage still reports all fetched
+// boards, while ranking, mainline counts, history and signal gates receive one
+// representative per overlapping theme family. The strongest qualified row is
+// retained so de-duplication cannot hide a genuinely stronger sub-theme.
+function collapseSemanticThemeDuplicates(sectors: NormalizedSector[]) {
+  const retained = new Map<string, NormalizedSector>();
+  for (const sector of sectors) {
+    const key = semanticThemeFamily(sector.name);
+    const current = retained.get(key);
+    if (!current) {
+      retained.set(key, sector);
+      continue;
+    }
+    const qualificationGap = Number(isQualified(sector)) - Number(isQualified(current));
+    if (qualificationGap > 0
+      || (qualificationGap === 0 && sector.score > current.score)
+      || (qualificationGap === 0 && sector.score === current.score && sector.flow > current.flow)) {
+      retained.set(key, sector);
+    }
+  }
+  return [...retained.values()];
 }
 
 async function applyHistoricalContinuity(sectors: NormalizedSector[]) {
@@ -406,7 +452,9 @@ export async function GET() {
       // not investable industry/theme mainlines. Excluding them prevents a
       // huge constituent count from crowding out concentrated sector moves.
       .filter((sector) => !META_BOARD_NAME.test(sector.name));
-    const ranked = (await applyHistoricalContinuity(collapseHierarchyDuplicates(normalized)))
+    const hierarchyCollapsed = collapseHierarchyDuplicates(normalized);
+    const continuityApplied = await applyHistoricalContinuity(hierarchyCollapsed);
+    const ranked = collapseSemanticThemeDuplicates(continuityApplied)
       // “结构分高”不等于“主线成立”。资金、扩散硬门槛必须先于
       // 分数排序，避免少数股暴涨或负流入板块占据主线首位。
       .sort((a, b) => {
@@ -441,6 +489,9 @@ export async function GET() {
       sectors: unique,
       scanCoverage: {
         fetchedBoards: ranked.length,
+        rawFetchedBoards: normalized.length,
+        hierarchyDedupedBoards: hierarchyCollapsed.length,
+        semanticDedupedBoards: ranked.length,
         broadSourcesReady,
         broadSourcesExpected: 2,
         indexSource: indices.length >= 2 ? "live" : resolvedIndices.length >= 2 ? "cached" : "unavailable",
