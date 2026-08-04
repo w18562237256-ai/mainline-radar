@@ -26,6 +26,32 @@ type SignalInput = {
   payload?: unknown;
 };
 
+const VERIFIED_CORE_SIGNALS: Record<string, { name: string; sectors: Set<string> }> = {
+  "300364": { name: "中文在线", sectors: new Set(["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体"]) },
+  "300058": { name: "蓝色光标", sectors: new Set(["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体"]) },
+};
+
+function isAuditableSignal(row: Record<string, unknown>) {
+  if (row.signal_type === "core") {
+    const verified = VERIFIED_CORE_SIGNALS[String(row.stock_code)];
+    return Boolean(verified
+      && verified.name === row.stock_name
+      && verified.sectors.has(String(row.sector_name)));
+  }
+  if (row.signal_type === "chase") {
+    try {
+      const payload = JSON.parse(String(row.payload || "{}")) as {
+        sector?: { limitUps?: number; limitUpsExact?: boolean };
+      };
+      return payload.sector?.limitUpsExact === true
+        && Number(payload.sector.limitUps) >= 2;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
 async function ensureSchema() {
   if (!env.DB) throw new Error("D1 binding unavailable");
   await env.DB.prepare(schemaSql).run();
@@ -38,13 +64,20 @@ export async function GET(request: Request) {
     const date = url.searchParams.get("date");
     const query = date
       ? env.DB.prepare(`SELECT event_key, trade_date, triggered_at, signal_type, stock_code,
-          stock_name, sector_name, score, summary FROM signal_events
+          stock_name, sector_name, score, summary, payload FROM signal_events
           WHERE trade_date = ? ORDER BY triggered_at DESC LIMIT 50`).bind(date)
       : env.DB.prepare(`SELECT event_key, trade_date, triggered_at, signal_type, stock_code,
-          stock_name, sector_name, score, summary FROM signal_events
+          stock_name, sector_name, score, summary, payload FROM signal_events
           ORDER BY triggered_at DESC LIMIT 50`);
     const { results } = await query.all();
-    return Response.json({ events: results ?? [] }, { headers: { "Cache-Control": "no-store" } });
+    const events = (results ?? [])
+      .filter((row) => isAuditableSignal(row as Record<string, unknown>))
+      .map((row) => {
+        const event = { ...row } as Record<string, unknown>;
+        delete event.payload;
+        return event;
+      });
+    return Response.json({ events }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ events: [], storageReady: false });
   }
@@ -66,6 +99,12 @@ export async function POST(request: Request) {
       || input.score > 100
     ) {
       return Response.json({ error: "Invalid signal event" }, { status: 400 });
+    }
+    if (input.signalType === "core") {
+      const verified = VERIFIED_CORE_SIGNALS[input.stockCode];
+      if (!verified || verified.name !== input.stockName || !verified.sectors.has(input.sectorName)) {
+        return Response.json({ error: "Unverified core-sector pairing" }, { status: 400 });
+      }
     }
     await ensureSchema();
     await env.DB.prepare(
