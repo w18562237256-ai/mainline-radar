@@ -31,14 +31,39 @@ test("hierarchical Eastmoney duplicates collapse before ranking and continuity",
   assert.ok(source.includes("function collapseHierarchyDuplicates"));
   assert.ok(source.includes("function isSameHierarchyQuote"));
   assert.ok(source.includes("hierarchyDepth(right.name) - hierarchyDepth(left.name)"));
-  assert.ok(source.includes("applyHistoricalContinuity(collapseHierarchyDuplicates(normalized))"));
+  assert.ok(source.includes("const hierarchyCollapsed = collapseHierarchyDuplicates(normalized)"));
+  assert.ok(source.includes("applyHistoricalContinuity(hierarchyCollapsed)"));
+});
+
+test("overlapping concept families collapse before mainline ranking and signals", async () => {
+  const source = await readFile(new URL("../app/api/eastmoney/route.ts", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.ok(source.includes("SEMANTIC_THEME_FAMILIES"));
+  assert.ok(source.includes("function collapseSemanticThemeDuplicates"));
+  assert.ok(source.includes("collapseSemanticThemeDuplicates(continuityApplied)"));
+  assert.ok(source.includes('key: "optical-networking"'));
+  assert.ok(source.includes('key: "ai-applications"'));
+  assert.ok(source.includes("limitUpsExact: false"));
+  assert.ok(page.includes("item.sector.limitUpsExact === true"));
+  assert.ok(page.includes("item.sector.limitUps >= 2"));
+  assert.ok(!page.includes('"互联网服务", "计算机", "软件开发", "信创"'));
+});
+
+test("signal history hides unauditable role and sector pairings", async () => {
+  const source = await readFile(new URL("../app/api/signals/route.ts", import.meta.url), "utf8");
+
+  assert.ok(source.includes("VERIFIED_CORE_SIGNALS"));
+  assert.ok(source.includes("function isAuditableSignal"));
+  assert.ok(source.includes("payload.sector?.limitUpsExact === true"));
+  assert.ok(source.includes("Unverified core-sector pairing"));
 });
 
 test("stock and browser refreshes are bounded and deduplicated", async () => {
   const stockSource = await readFile(new URL("../app/api/stocks/route.ts", import.meta.url), "utf8");
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
-  assert.ok(stockSource.includes("STOCK_SCAN_BUDGET_MS = 6_000"));
+  assert.ok(stockSource.includes("STOCK_SCAN_BUDGET_MS = 8_000"));
   assert.ok(stockSource.includes("Math.min(STOCK_ATTEMPT_TIMEOUT_MS, remainingMs)"));
   assert.ok(stockSource.includes("preferredStockHost = host"));
   assert.ok(pageSource.includes("if (marketInFlightRef.current) return"));
