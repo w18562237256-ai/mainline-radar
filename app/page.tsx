@@ -1094,7 +1094,9 @@ export default function Home() {
           {signalEvents.slice(0, 3).map((event) => (
             <article key={event.event_key}>
               <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
-              <strong>{event.stock_name} · {event.sector_name}</strong>
+              <strong>{event.signal_type === "recovery"
+                ? `${event.sector_name} · 板块修复观察`
+                : `${event.stock_name} · ${event.sector_name}`}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
           ))}
