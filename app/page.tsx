@@ -15,6 +15,7 @@ type Sector = {
   flow: number;
   streak: number;
   limitUps: number;
+  limitUpsExact?: boolean;
   breadth: number;
   leader: string;
   leaderCode?: string;
@@ -105,12 +106,12 @@ const CORE_FOLLOWER_UNIVERSE = [
   {
     code: "300364",
     name: "中文在线",
-    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体", "互联网服务", "计算机", "软件开发", "信创"],
+    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体"],
   },
   {
     code: "300058",
     name: "蓝色光标",
-    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体", "互联网服务", "计算机", "软件开发", "信创"],
+    sectorNames: ["AI应用", "AIGC概念", "ChatGPT概念", "AI智能体"],
   },
 ] as const;
 
@@ -816,7 +817,11 @@ export default function Home() {
     && item.sector.change >= 3
     && item.sector.flow >= 20
     && item.sector.breadth >= 88
-    && item.sector.limitUps >= 1
+    // A single board leader at the limit is not a "梯队". Only enable this
+    // lane when the source supplies an exact count with at least two front-row
+    // limit-ups; otherwise keep the stock in the acceleration watchlist.
+    && item.sector.limitUpsExact === true
+    && item.sector.limitUps >= 2
     && item.sector.leaderChange >= 9.5
     && item.opportunity >= 72
   );
@@ -1028,7 +1033,7 @@ export default function Home() {
             : "暂无满足条件的龙头追高监测"}</strong>
           <p>{hasLeaderChaseSignal && leaderChasePick
             ? `板块涨${leaderChasePick.sector.change.toFixed(2)}%、资金净流入${leaderChasePick.sector.flow.toFixed(2)}亿、上涨扩散率${leaderChasePick.sector.breadth}%、涨停梯队${leaderChasePick.sector.limitUps}只。仅适用于已确认的首日/两日主线强龙头；开板回落、板块前排转弱或进入连续加速后立即失效。`
-            : "只监测首日或两日主线中，资金、扩散、涨停梯队同时极强的龙头；不在退潮方向、连续多日加速或单股独涨时提示。"}</p>
+            : "只监测首日或两日主线中，资金、扩散及至少两只前排涨停同时成立的龙头；实时源未提供完整梯队时仅保留观察，不生成追高提示。"}</p>
         </div>
         <div className="trade-alert-metrics">
           <span><small>龙头</small><b>{leaderChasePick?.sector.leader ?? "等待"}</b></span>
@@ -1088,7 +1093,7 @@ export default function Home() {
           </div>
           {signalEvents.slice(0, 3).map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.stock_name} · {event.sector_name}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
