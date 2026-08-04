@@ -10,12 +10,14 @@ const EASTMONEY_HEADERS = {
 };
 const EASTMONEY_UT = "fa5fd1943c7b386f172d6893dbfba10b";
 const EASTMONEY_HOSTS = [
+  "https://48.push2.eastmoney.com",
+  "https://92.push2.eastmoney.com",
   "https://20.push2.eastmoney.com",
   "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
-const STOCK_SCAN_BUDGET_MS = 6_000;
-const STOCK_ATTEMPT_TIMEOUT_MS = 2_500;
+const STOCK_SCAN_BUDGET_MS = 8_000;
+const STOCK_ATTEMPT_TIMEOUT_MS = 3_000;
 let preferredStockHost = EASTMONEY_HOSTS[0];
 const stockCacheSchemaSql = `CREATE TABLE IF NOT EXISTS stock_quote_cache (
   code TEXT PRIMARY KEY,
@@ -36,10 +38,15 @@ function secid(code: string) {
   return `${/^(6|68|9)/.test(code) ? "1" : "0"}.${code}`;
 }
 
-async function fetchStock(code: string) {
-  const fields = "f43,f44,f45,f46,f47,f48,f57,f58,f137,f168,f169,f170";
-  const path = `/api/qt/stock/get?invt=2&secid=${secid(code)}&ut=${EASTMONEY_UT}&fields=${fields}`;
-  let row: EastmoneyStock | null = null;
+async function fetchStocks(codes: string[]) {
+  // A previous implementation opened one upstream request per stock. With a
+  // 7-12 name watchlist this caused Eastmoney and the Worker runtime to cancel
+  // whole batches during busy periods. ulist returns the same quote fields for
+  // every requested security in one response, so one retry chain now serves
+  // the complete watchlist.
+  const fields = "f12,f14,f2,f3,f4,f5,f6,f8,f15,f16,f17,f62";
+  const path = `/api/qt/ulist.np/get?fltt=2&invt=2&ut=${EASTMONEY_UT}&fields=${fields}&secids=${codes.map(secid).join("%2C")}`;
+  let rows: EastmoneyStock[] | null = null;
   const deadline = Date.now() + STOCK_SCAN_BUDGET_MS;
   const hosts = [
     preferredStockHost,
@@ -58,38 +65,45 @@ async function fetchStock(code: string) {
         await response.body?.cancel();
         continue;
       }
-      const json = await response.json() as { data?: EastmoneyStock | null };
-      if (!json.data?.f57) continue;
-      row = json.data;
+      const json = await response.json() as { data?: { diff?: EastmoneyStock[] } | null };
+      if (!json.data?.diff?.length) continue;
+      rows = json.data.diff;
       preferredStockHost = host;
       break;
     } catch {
       // Try the next Eastmoney quote node.
     }
   }
-  if (!row) throw new Error(`No quote for ${code}`);
+  if (!rows) throw new Error("No stock quote batch");
 
-  return {
-    code: String(row.f57),
-    name: String(row.f58 || code),
-    price: numeric(row.f43) / 100,
-    change: numeric(row.f170) / 100,
-    changeValue: numeric(row.f169) / 100,
-    open: numeric(row.f46) / 100,
-    high: numeric(row.f44) / 100,
-    low: numeric(row.f45) / 100,
-    volume: numeric(row.f47),
-    amount: numeric(row.f48),
-    turnover: numeric(row.f168) / 100,
-    flow: numeric(row.f137),
-  };
+  return rows.map((row) => ({
+    code: String(row.f12),
+    name: String(row.f14 || row.f12 || ""),
+    price: numeric(row.f2),
+    change: numeric(row.f3),
+    changeValue: numeric(row.f4),
+    open: numeric(row.f17),
+    high: numeric(row.f15),
+    low: numeric(row.f16),
+    volume: numeric(row.f5),
+    amount: numeric(row.f6),
+    turnover: numeric(row.f8),
+    flow: numeric(row.f62),
+  })).filter((quote) => /^\d{6}$/.test(quote.code));
 }
 
-type StockQuote = Awaited<ReturnType<typeof fetchStock>>;
+type StockQuote = Awaited<ReturnType<typeof fetchStocks>>[number];
+
+async function ensureStockCache() {
+  try {
+    await env.DB.prepare(stockCacheSchemaSql).run();
+  } catch {
+    // Live quotes remain usable when the persistent cache is unavailable.
+  }
+}
 
 async function readStockCache(code: string) {
   try {
-    await env.DB.prepare(stockCacheSchemaSql).run();
     const row = await env.DB.prepare(
       `SELECT updated_at, payload FROM stock_quote_cache WHERE code = ?`
     ).bind(code).first<{ updated_at: string; payload: string }>();
@@ -105,7 +119,6 @@ async function readStockCache(code: string) {
 
 async function writeStockCache(quote: StockQuote, updatedAt: string) {
   try {
-    await env.DB.prepare(stockCacheSchemaSql).run();
     await env.DB.prepare(
       `INSERT INTO stock_quote_cache (code, updated_at, payload)
        VALUES (?, ?, ?)
@@ -123,6 +136,7 @@ export async function GET(request: NextRequest) {
   const codes = [...new Set(raw.split(",").filter((code) => /^\d{6}$/.test(code)))].slice(0, 12);
   if (!codes.length) return NextResponse.json({ source: "eastmoney", stocks: [] });
 
+  await ensureStockCache();
   const cacheEntries = await Promise.all(codes.map(readStockCache));
   const quotes = new Map<string, StockQuote>();
   const staleCodes: string[] = [];
@@ -131,13 +145,16 @@ export async function GET(request: NextRequest) {
     else staleCodes.push(codes[index]);
   });
 
-  const liveResults = await Promise.allSettled(staleCodes.map(fetchStock));
+  const liveBatch = staleCodes.length
+    ? await fetchStocks(staleCodes).catch(() => [])
+    : [];
+  const liveByCode = new Map(liveBatch.map((quote) => [quote.code, quote]));
   const liveUpdatedAt = new Date().toISOString();
-  await Promise.all(liveResults.map(async (result, index) => {
-    const code = staleCodes[index];
-    if (result.status === "fulfilled") {
-      quotes.set(code, result.value);
-      await writeStockCache(result.value, liveUpdatedAt);
+  await Promise.all(staleCodes.map(async (code) => {
+    const liveQuote = liveByCode.get(code);
+    if (liveQuote) {
+      quotes.set(code, liveQuote);
+      await writeStockCache(liveQuote, liveUpdatedAt);
       return;
     }
     const originalIndex = codes.indexOf(code);
@@ -148,10 +165,7 @@ export async function GET(request: NextRequest) {
     const quote = quotes.get(code);
     return quote ? [quote] : [];
   });
-  const usedDelayedCache = staleCodes.some((code, index) => {
-    const result = liveResults[index];
-    return result?.status === "rejected" && quotes.has(code);
-  });
+  const usedDelayedCache = staleCodes.some((code) => !liveByCode.has(code) && quotes.has(code));
 
   return NextResponse.json({
     source: stocks.length ? (usedDelayedCache ? "delayed" : "eastmoney") : "fallback",
