@@ -72,6 +72,15 @@ test("signal history hides unauditable role and sector pairings", async () => {
   assert.ok(source.includes("Unverified core-sector pairing"));
 });
 
+test("today's early signal records remain visible ahead of later recovery observations", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.ok(page.includes("const displayedSignalEvents = ["));
+  assert.ok(page.includes("event.signal_type !== \"recovery\""));
+  assert.ok(page.includes("当日触发记录"));
+  assert.ok(page.includes("早期买点（观察）"));
+});
+
 test("stock and browser refreshes are bounded and deduplicated", async () => {
   const stockSource = await readFile(new URL("../app/api/stocks/route.ts", import.meta.url), "utf8");
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
