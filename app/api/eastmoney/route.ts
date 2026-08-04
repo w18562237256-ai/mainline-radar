@@ -42,7 +42,7 @@ const PRIORITY_BOARD_IDS = new Set([
 // Market-behaviour, valuation and holding ranges are useful context, but are
 // not investable industry chains. Keep user-requested style factors in the
 // ranking while excluding the former from mainline confirmation and leaders.
-const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普概念|富时罗素|MSCI中国|昨日.*|近期新高|百日新高|高市净率|低市净率|高股息|连续涨停|连板.*)$/;
+const META_BOARD_NAME = /^(融资融券|沪股通|深股通|沪深股通|标普概念|富时罗素|MSCI中国|创业板综|创业成份|东方财富热股|昨日.*|近期新高|百日新高|高市净率|低市净率|高股息|连续涨停|连板.*)$/;
 const STYLE_BOARD_NAME = /^(微盘股|小盘股|中盘股|大盘股|低价股|高价股|百元股|超跌股|破发股|破净股|破增发价股|超级品牌|消费风格|科技风格|大盘成长|中盘成长|小盘成长|大盘价值|中盘价值|小盘价值)$/;
 const HOLDING_BOARD_NAME = /^(证金持股|基金重仓|社保重仓|QFII重仓|陆股通重仓)$/;
 const HIERARCHY_SUFFIX = /([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+)$/;
@@ -54,7 +54,11 @@ const HIERARCHY_SUFFIX = /([ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ]+)$/;
 const SEMANTIC_THEME_FAMILIES = [
   {
     key: "optical-networking",
-    names: new Set(["CPO概念", "光通信模块", "光通信", "光纤", "通信网络设备及器件", "通信设备", "通信技术"]),
+    names: new Set(["CPO概念", "F5G概念", "光通信模块", "光通信", "光纤", "光纤概念", "通信网络设备及器件", "通信设备", "通信技术", "通信", "5G概念"]),
+  },
+  {
+    key: "printed-circuit-boards",
+    names: new Set(["PCB", "印制电路板"]),
   },
   {
     key: "ai-applications",
