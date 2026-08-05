@@ -45,6 +45,8 @@ test("overlapping concept families collapse before mainline ranking and signals"
   assert.ok(source.includes('key: "optical-networking"'));
   assert.ok(source.includes('key: "printed-circuit-boards"'));
   assert.ok(source.includes('key: "ai-applications"'));
+  assert.ok(source.includes("exact-concept-alias:"));
+  assert.ok(source.includes('availableNames.has(`${baseName}概念`)'));
   assert.ok(source.includes('"光纤概念"'));
   assert.ok(source.includes('"5G概念"'));
   assert.ok(source.includes('"通信"'));
