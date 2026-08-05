@@ -556,7 +556,7 @@ export default function Home() {
     try {
       const response = await fetch(`/api/stocks?codes=${encodeURIComponent(codes.join(","))}`, {
         cache: "no-store",
-        signal: AbortSignal.timeout(10_000),
+        signal: AbortSignal.timeout(14_000),
       });
       if (!response.ok) throw new Error("个股行情请求失败");
       const payload = await response.json() as { source?: "eastmoney" | "delayed" | "fallback"; updatedAt?: string; stocks: StockQuote[] };
