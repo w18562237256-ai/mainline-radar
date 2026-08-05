@@ -761,7 +761,7 @@ export default function Home() {
         : sector.streak === 2
           ? "首次确认"
         : sector.phase === "启动" && sector.leaderChange >= 3
-          ? "首板观察"
+          ? "首日观察"
           : "潜伏异动";
       return { sector, opportunity, stage };
     })
@@ -794,7 +794,7 @@ export default function Home() {
   // an advancing (not limit-up) leader, and a real sector move. The normal
   // two-day confirmation remains the preferred path.
   const firstDayProbePick = earlyCandidates.find((item) =>
-    item.stage === "首板观察"
+    item.stage === "首日观察"
     && item.sector.streak === 1
     && item.sector.score >= 72
     && item.sector.change >= 1.5
@@ -853,7 +853,7 @@ export default function Home() {
           stockName: tradePick.sector.leader,
           sectorName: tradePick.sector.name,
           score: tradePick.opportunity,
-          summary: `${tradePick.sector.name}${tradePick.sector.streak === 1 ? "出现首日启动" : "进入首次确认"}，${tradePick.sector.leader}出现早期观察信号。`,
+          summary: `${tradePick.sector.name}${tradePick.sector.streak === 1 ? "出现首日启动" : "进入首次确认"}；${tradePick.sector.leader}仅作领涨强弱参照，不构成个股买点。`,
           payload: { sector: tradePick.sector },
         }
       : hasCoreFollowerSignal && coreFollowerPick
@@ -982,14 +982,14 @@ export default function Home() {
         <p><b className="trade-date">交易日期 {formatTradeDate(quoteTimestamp)}</b> · {closeReviewReady ? "当日收盘复盘" : lunchReviewReady ? "午间复盘" : auctionReady ? "集合竞价监测" : source === "eastmoney" ? "东方财富行情" : source === "delayed" ? `延迟${delayLabel}` : "行情暂停"} · 行情截至 {formatUpdateTime(quoteTimestamp)} · 抓取 {formatUpdateTime(updatedAt).split(" ").at(-1)}</p>
       </section>
 
-      <section className={`trade-alert ${hasTradeSignal ? "signal-on" : "signal-off"}`} aria-live="polite">
+      <section className={`trade-alert ${hasTradeSignal ? "sector-observe" : "signal-off"}`} aria-live="polite">
         <div className="trade-alert-label">
           <i />
-          <span>当前交易提示</span>
+          <span>当前板块观察</span>
         </div>
         <div className="trade-alert-main">
           <strong>{hasTradeSignal
-            ? `${alertSector.leader} 出现早期观察信号`
+            ? `${alertSector.name}板块出现${tradePick?.sector.streak === 1 ? "首日异动" : "首次确认"}观察`
             : auctionReady
               ? `${isAuctionObserve ? "竞价观察" : isAuctionLocked ? "竞价锁单" : "竞价预判"}｜开盘承接后再确认`
             : closeReviewReady
@@ -1004,7 +1004,7 @@ export default function Home() {
                   ? `${strongest.leader} 已加速｜龙头确认但不宜追高`
                   : "暂无低风险早期买点"}</strong>
           <p>{hasTradeSignal
-            ? `${alertSector.name}刚进入启动窗口，主力净流入${alertSector.flow.toFixed(2)}亿，上涨家数占比${alertSector.breadth}%，龙头涨幅${alertSector.leaderChange.toFixed(2)}%。这是进入观察池的信号，等待换手承接后再小仓试错。`
+            ? `${alertSector.name}刚进入板块观察窗口，资金净流入${alertSector.flow.toFixed(2)}亿、上涨扩散率${alertSector.breadth}%。领涨股${alertSector.leader}已涨${alertSector.leaderChange.toFixed(2)}%，仅作强弱参照；这不是个股买点，仍需等待换手、承接和前排梯队确认。`
             : auctionReady
               ? `${strongest.name}竞价结构暂时领先，龙头候选为${strongest.leader}。竞价阶段只形成候选，不生成买入提示；09:30后必须继续验证板块扩散、龙头换手承接与前排同步。`
             : closeReviewReady
@@ -1023,8 +1023,8 @@ export default function Home() {
         </div>
         <div className="trade-alert-metrics">
           <span><small>监测方向</small><b>{alertSector.name}</b></span>
-          <span><small>机会分</small><b>{earlyPick?.opportunity ?? "—"}</b></span>
-          <span><small>阶段</small><b>{earlyPick?.stage ?? "等待"}</b></span>
+          <span><small>结构分</small><b>{tradePick?.opportunity ?? earlyPick?.opportunity ?? "—"}</b></span>
+          <span><small>阶段</small><b>{tradePick?.stage ?? earlyPick?.stage ?? "等待"}</b></span>
         </div>
         <button onClick={openEvidence} aria-controls="signal-evidence">
           查看依据
@@ -1099,14 +1099,16 @@ export default function Home() {
           <div>
             <span>信号留痕</span>
             <strong>当日触发记录</strong>
-            <small>候选信号优先展示；修复观察仅作复盘，不等同买入提示。</small>
+            <small>板块观察与个股买点分开记录；只有弱转强或严格追高监测才属于个股级信号。</small>
           </div>
           {displayedSignalEvents.map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "早期买点（观察）"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "板块早期观察"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.signal_type === "recovery"
                 ? `${event.sector_name} · 板块修复观察`
-                : `${event.stock_name} · ${event.sector_name}`}</strong>
+                : event.signal_type === "early"
+                  ? `${event.sector_name} · 板块启动观察`
+                  : `${event.stock_name} · ${event.sector_name}`}</strong>
               <small>评分 {event.score}｜{event.summary}</small>
             </article>
           ))}
