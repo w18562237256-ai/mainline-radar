@@ -147,12 +147,15 @@ button { color: inherit; }
 .trade-alert::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background: linear-gradient(100deg, transparent 45%, rgba(255,255,255,.025)); }
 .trade-alert.signal-on { border-color: rgba(255,107,107,.52); background: linear-gradient(100deg, rgba(87,21,21,.52), rgba(32,14,15,.9)); box-shadow: 0 0 30px rgba(255,107,107,.08); }
 .trade-alert.signal-off { border-color: rgba(246,199,100,.3); background: linear-gradient(100deg, rgba(53,42,17,.42), rgba(16,22,18,.94)); }
+.trade-alert.sector-observe { border-color: rgba(246,199,100,.46); background: linear-gradient(100deg, rgba(69,50,16,.48), rgba(18,23,18,.94)); box-shadow: 0 0 26px rgba(246,199,100,.07); }
 .trade-alert-label { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 10px; letter-spacing: .08em; }
 .trade-alert-label i { width: 9px; height: 9px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px rgba(246,199,100,.7); }
 .signal-on .trade-alert-label i { background: var(--red); box-shadow: 0 0 13px rgba(255,107,107,.85); animation: alertPulse 1.4s ease-in-out infinite; }
 .trade-alert-main { min-width: 0; }
 .trade-alert-main strong { display: block; font-size: 18px; }
 .signal-on .trade-alert-main strong { color: #ff9090; }
+.sector-observe .trade-alert-main strong { color: #f6c764; }
+.sector-observe .trade-alert-label i { background: var(--amber); box-shadow: 0 0 13px rgba(246,199,100,.82); animation: alertPulse 1.8s ease-in-out infinite; }
 .trade-alert-main p { margin: 7px 0 0; color: #9fb2aa; font-size: 10px; line-height: 1.6; }
 .trade-alert-metrics { display: flex; gap: 1px; background: var(--line); border: 1px solid var(--line); }
 .trade-alert-metrics span { min-width: 78px; padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; background: #0a1511; }
