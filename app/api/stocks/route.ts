@@ -10,14 +10,19 @@ const EASTMONEY_HEADERS = {
 };
 const EASTMONEY_UT = "fa5fd1943c7b386f172d6893dbfba10b";
 const EASTMONEY_HOSTS = [
+  "https://82.push2.eastmoney.com",
+  "https://20.push2.eastmoney.com",
   "https://48.push2.eastmoney.com",
   "https://92.push2.eastmoney.com",
-  "https://20.push2.eastmoney.com",
-  "https://82.push2.eastmoney.com",
   "https://push2.eastmoney.com",
 ];
-const STOCK_SCAN_BUDGET_MS = 8_000;
-const STOCK_ATTEMPT_TIMEOUT_MS = 3_000;
+// Eastmoney's individual-quote nodes commonly need 4-5 seconds during the
+// opening hour. A 3 second attempt timeout made every otherwise valid node
+// fail before it could respond, so the API returned an empty fallback batch.
+// Keep the total bounded below the browser timeout while allowing two useful
+// attempts instead of cancelling every request prematurely.
+const STOCK_SCAN_BUDGET_MS = 12_000;
+const STOCK_ATTEMPT_TIMEOUT_MS = 5_500;
 let preferredStockHost = EASTMONEY_HOSTS[0];
 const stockCacheSchemaSql = `CREATE TABLE IF NOT EXISTS stock_quote_cache (
   code TEXT PRIMARY KEY,
