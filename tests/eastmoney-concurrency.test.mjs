@@ -85,11 +85,12 @@ test("stock and browser refreshes are bounded and deduplicated", async () => {
   const stockSource = await readFile(new URL("../app/api/stocks/route.ts", import.meta.url), "utf8");
   const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
-  assert.ok(stockSource.includes("STOCK_SCAN_BUDGET_MS = 8_000"));
+  assert.ok(stockSource.includes("STOCK_SCAN_BUDGET_MS = 12_000"));
+  assert.ok(stockSource.includes("STOCK_ATTEMPT_TIMEOUT_MS = 5_500"));
   assert.ok(stockSource.includes("Math.min(STOCK_ATTEMPT_TIMEOUT_MS, remainingMs)"));
   assert.ok(stockSource.includes("preferredStockHost = host"));
   assert.ok(pageSource.includes("if (marketInFlightRef.current) return"));
   assert.ok(pageSource.includes("if (stocksInFlightRef.current) return"));
   assert.ok(pageSource.includes("signal: AbortSignal.timeout(18_000)"));
-  assert.ok(pageSource.includes("signal: AbortSignal.timeout(10_000)"));
+  assert.ok(pageSource.includes("signal: AbortSignal.timeout(14_000)"));
 });
