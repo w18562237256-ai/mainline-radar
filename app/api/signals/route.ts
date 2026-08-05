@@ -74,6 +74,9 @@ export async function GET(request: Request) {
       .filter((row) => isAuditableSignal(row as Record<string, unknown>))
       .map((row) => {
         const event = { ...row } as Record<string, unknown>;
+        if (event.signal_type === "early") {
+          event.summary = `${String(event.sector_name)}进入早期观察；领涨股仅作强弱参照，不构成个股买点。`;
+        }
         delete event.payload;
         return event;
       });
