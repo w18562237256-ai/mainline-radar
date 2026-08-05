@@ -283,8 +283,19 @@ function collapseHierarchyDuplicates(sectors: NormalizedSector[]) {
   return retained;
 }
 
-function semanticThemeFamily(name: string) {
-  return SEMANTIC_THEME_FAMILIES.find((family) => family.names.has(name))?.key ?? `board:${name}`;
+function semanticThemeFamily(name: string, availableNames: Set<string>) {
+  const configured = SEMANTIC_THEME_FAMILIES.find((family) => family.names.has(name))?.key;
+  if (configured) return configured;
+  // Eastmoney sometimes publishes both an industry board and an otherwise
+  // identical "概念" alias (for example 半导体/半导体概念 or
+  // 小金属/小金属概念). Only collapse the suffix form when the exact base
+  // board is present in the same response. This removes a true alias without
+  // merging distinct themes such as 中芯概念、英伟达概念 or 存储芯片.
+  const baseName = name.endsWith("概念") ? name.slice(0, -2) : name;
+  if (availableNames.has(baseName) && availableNames.has(`${baseName}概念`)) {
+    return `exact-concept-alias:${baseName}`;
+  }
+  return `board:${name}`;
 }
 
 // Collapse only the model universe. Scan coverage still reports all fetched
@@ -293,8 +304,9 @@ function semanticThemeFamily(name: string) {
 // retained so de-duplication cannot hide a genuinely stronger sub-theme.
 function collapseSemanticThemeDuplicates(sectors: NormalizedSector[]) {
   const retained = new Map<string, NormalizedSector>();
+  const availableNames = new Set(sectors.map((sector) => sector.name));
   for (const sector of sectors) {
-    const key = semanticThemeFamily(sector.name);
+    const key = semanticThemeFamily(sector.name, availableNames);
     const current = retained.get(key);
     if (!current) {
       retained.set(key, sector);
