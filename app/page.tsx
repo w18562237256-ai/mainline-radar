@@ -79,7 +79,7 @@ type SignalEvent = {
   event_key: string;
   trade_date: string;
   triggered_at: string;
-  signal_type: "early" | "add" | "recovery" | "core" | "chase";
+  signal_type: "early" | "add" | "recovery" | "core" | "chase" | "precursor";
   stock_code: string;
   stock_name: string;
   sector_name: string;
@@ -130,6 +130,13 @@ type StockQuote = {
   amount: number;
   turnover: number;
   flow: number;
+};
+
+type LeaderEvidence = {
+  hits: number;
+  firstSeenAt: number;
+  lastSeenAt: number;
+  lastSampleKey: string;
 };
 
 const fallbackSectors: Sector[] = [
@@ -398,6 +405,8 @@ export default function Home() {
   const [stockError, setStockError] = useState("");
   const [stockLoading, setStockLoading] = useState(false);
   const [stockUpdatedAt, setStockUpdatedAt] = useState("");
+  const [stockSource, setStockSource] = useState<"eastmoney" | "delayed" | "fallback">("fallback");
+  const [leaderEvidence, setLeaderEvidence] = useState<Record<string, LeaderEvidence>>({});
   const [historyDates, setHistoryDates] = useState<HistorySummary[]>([]);
   const [historyDate, setHistoryDate] = useState("");
   const [historySnapshot, setHistorySnapshot] = useState<HistorySnapshot | null>(null);
@@ -563,8 +572,10 @@ export default function Home() {
       if (!payload.stocks?.length) throw new Error("个股行情为空");
       setStockQuotes(payload.stocks);
       setStockUpdatedAt(payload.updatedAt || new Date().toISOString());
+      setStockSource(payload.source || "fallback");
       setStockError(payload.source === "delayed" ? "部分个股暂时使用最近一次有效行情，页面会继续自动重试" : "");
     } catch {
+      setStockSource("fallback");
       setStockError("东财个股行情暂时未响应，已保留自选和上一份数据，可点右侧刷新重试");
     } finally {
       stocksInFlightRef.current = false;
@@ -625,6 +636,22 @@ export default function Home() {
     // stockCodes is intentionally restored once; later refreshes use stockCodesRef.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchHistory, fetchMarket, fetchSignals, fetchStocks]);
+
+  // The former model fetched only the manual watchlist and two hard-coded AI
+  // cores. A stock that led a newly emerging theme therefore had no intraday
+  // quote path until somebody added it by hand. Continuously include the
+  // leading stocks of the strongest live sectors, while keeping the upstream
+  // request capped at twelve names.
+  useEffect(() => {
+    if (!modelReady) return;
+    const liveLeaderCodes = effectiveSectors
+      .filter((sector) => sector.category !== "持仓标签" && sector.leaderCode)
+      .sort((left, right) => right.score - left.score || right.flow - left.flow)
+      .map((sector) => sector.leaderCode!)
+      .filter((code, index, all) => all.indexOf(code) === index);
+    const monitoredCodes = [...new Set([...stockCodesRef.current, ...liveLeaderCodes])].slice(0, 12);
+    void fetchStocks(monitoredCodes);
+  }, [effectiveSectors, fetchStocks, modelReady]);
 
   const switchView = (view: View) => {
     setActiveView(view);
@@ -741,6 +768,79 @@ export default function Home() {
   }).sort((left, right) => right.score - left.score || right.stock.amount - left.stock.amount);
   const coreFollowerPick = coreFollowerCandidates[0];
   const hasCoreFollowerSignal = Boolean(coreFollowerPick) && isTradingTime && modelReady;
+  const precursorCandidates = useMemo(() => effectiveSectors.flatMap((sector) => {
+    if (
+      sector.category === "持仓标签"
+      || !sector.leaderCode
+      || sector.phase === "退潮"
+      || sector.score < 68
+      || sector.change < 1.2
+      || sector.flow <= 0
+      || sector.breadth < 58
+    ) return [];
+    const stock = stockQuotes.find((item) => item.code === sector.leaderCode);
+    if (!stock?.price || !stock.low || !stock.open) return [];
+    const priorClose = stock.price - stock.changeValue;
+    if (priorClose <= 0) return [];
+    const openChange = (stock.open / priorClose - 1) * 100;
+    const reboundFromLow = (stock.price / stock.low - 1) * 100;
+    // This lane is intentionally earlier than full mainline confirmation, but
+    // it is not a chase lane. Exclude high opens, limit approaches, thin
+    // turnover, negative individual flow and one-stock sector spikes.
+    if (
+      stock.change < 3
+      || stock.change >= 8.5
+      || openChange > 4
+      || stock.price <= stock.open
+      || reboundFromLow < 1
+      || stock.amount < 200_000_000
+      || stock.turnover < 2.5
+      || stock.flow <= 0
+    ) return [];
+    const score = Math.round(Math.min(100,
+      sector.score * .28
+      + sector.breadth * .18
+      + Math.min(90, 50 + sector.flow) * .14
+      + Math.min(90, stock.change * 9) * .18
+      + Math.min(90, reboundFromLow * 20) * .1
+      + Math.min(90, stock.turnover * 4) * .06
+      + Math.min(90, 45 + openChange * 8) * .06
+    ));
+    return [{ stock, sector, score, openChange, reboundFromLow }];
+  }).sort((left, right) => right.score - left.score || right.stock.flow - left.stock.flow), [effectiveSectors, stockQuotes]);
+
+  // Require three distinct 20-second stock samples. A single transient spike
+  // remains an unrecorded anomaly, which controls the false-positive rate.
+  useEffect(() => {
+    if (!modelReady || stockSource !== "eastmoney" || !stockUpdatedAt) return;
+    const timer = window.setTimeout(() => {
+      const now = Date.now();
+      const active = new Set(precursorCandidates.map((item) => item.stock.code));
+      setLeaderEvidence((current) => {
+        const next: Record<string, LeaderEvidence> = {};
+        for (const candidate of precursorCandidates) {
+          const code = candidate.stock.code;
+          const previous = current[code];
+          const sampleKey = stockUpdatedAt;
+          if (previous?.lastSampleKey === sampleKey) {
+            next[code] = previous;
+          } else if (previous && now - previous.lastSeenAt <= 90_000) {
+            next[code] = { ...previous, hits: previous.hits + 1, lastSeenAt: now, lastSampleKey: sampleKey };
+          } else {
+            next[code] = { hits: 1, firstSeenAt: now, lastSeenAt: now, lastSampleKey: sampleKey };
+          }
+        }
+        for (const [code, evidence] of Object.entries(current)) {
+          if (!active.has(code) && now - evidence.lastSeenAt <= 40_000) next[code] = evidence;
+        }
+        return next;
+      });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [modelReady, precursorCandidates, stockSource, stockUpdatedAt]);
+
+  const precursorPick = precursorCandidates.find((item) => (leaderEvidence[item.stock.code]?.hits ?? 0) >= 3);
+  const hasPrecursorObservation = Boolean(precursorPick) && isTradingTime && modelReady && stockSource === "eastmoney";
   const checks = confirmationChecks(selected);
   const passedChecks = checks.filter((item) => item.status === "pass").length;
   const earlyCandidates = effectiveSectors
@@ -845,7 +945,18 @@ export default function Home() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date(quoteTimestamp || nowMs));
-  const currentEvent = hasTradeSignal && tradePick
+  const currentEvent = hasPrecursorObservation && precursorPick
+      ? {
+          eventKey: `${tradeDateKey}:precursor:${precursorPick.stock.code}`,
+          signalType: "precursor" as const,
+          stockCode: precursorPick.stock.code,
+          stockName: precursorPick.stock.name,
+          sectorName: precursorPick.sector.name,
+          score: precursorPick.score,
+          summary: `${precursorPick.stock.name}连续三次刷新保持个股主动走强，${precursorPick.sector.name}资金与扩散同步；仅作龙头先手观察，未完成板块连续性确认，不构成买入提示。`,
+          payload: { stock: precursorPick.stock, sector: precursorPick.sector, openChange: precursorPick.openChange, reboundFromLow: precursorPick.reboundFromLow, confirmationHits: leaderEvidence[precursorPick.stock.code]?.hits ?? 0 },
+        }
+      : hasTradeSignal && tradePick
       ? {
           eventKey: `${tradeDateKey}:early:${tradePick.sector.id}`,
           signalType: "early" as const,
@@ -1073,6 +1184,27 @@ export default function Home() {
         <button onClick={openCoreEvidence}>查看板块</button>
       </section>
 
+      <section className={`precursor-alert ${hasPrecursorObservation ? "signal-on" : "signal-off"}`} aria-live="polite">
+        <div className="trade-alert-label">
+          <i />
+          <span>龙头先手观察</span>
+        </div>
+        <div className="trade-alert-main">
+          <strong>{hasPrecursorObservation && precursorPick
+            ? `${precursorPick.stock.name} 个股先于板块确认｜${precursorPick.sector.name}`
+            : "暂无通过连续确认的龙头先手观察"}</strong>
+          <p>{hasPrecursorObservation && precursorPick
+            ? `连续${leaderEvidence[precursorPick.stock.code]?.hits ?? 0}次刷新保持主动走强：涨幅${precursorPick.stock.change.toFixed(2)}%、较日内低点回升${precursorPick.reboundFromLow.toFixed(2)}%、换手${precursorPick.stock.turnover.toFixed(2)}%，板块资金净流入${precursorPick.sector.flow.toFixed(2)}亿、扩散率${precursorPick.sector.breadth}%。这是提前留痕，不是买入提示；跌回日内低点、个股资金转负或板块扩散跌破58%即失效。`
+            : "自动跟踪强势板块的实时领涨股；需涨幅3%—8.5%、非高开冲顶、资金和换手为正，并连续三次20秒刷新成立，避免把单次脉冲误判为龙头。"}</p>
+        </div>
+        <div className="trade-alert-metrics">
+          <span><small>候选龙头</small><b>{precursorPick?.stock.name ?? "等待"}</b></span>
+          <span><small>先手分</small><b>{precursorPick?.score ?? "—"}</b></span>
+          <span><small>确认样本</small><b>{precursorPick ? `${leaderEvidence[precursorPick.stock.code]?.hits ?? 0}/3` : "0/3"}</b></span>
+        </div>
+        <button onClick={openEvidence}>查看板块</button>
+      </section>
+
       <section className={`recovery-alert ${hasRecoveryObservation ? "signal-on" : "signal-off"}`} aria-live="polite">
         <div className="trade-alert-label">
           <i />
@@ -1103,7 +1235,7 @@ export default function Home() {
           </div>
           {displayedSignalEvents.map((event) => (
             <article key={event.event_key}>
-              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "板块早期观察"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
+              <span>{event.signal_type === "chase" ? "龙头追高监测" : event.signal_type === "core" ? "核心股弱转强" : event.signal_type === "precursor" ? "龙头先手观察" : event.signal_type === "add" ? "加仓观察" : event.signal_type === "recovery" ? "强修复观察" : "板块早期观察"} · {formatUpdateTime(event.triggered_at).split(" ").at(-1)}</span>
               <strong>{event.signal_type === "recovery"
                 ? `${event.sector_name} · 板块修复观察`
                 : event.signal_type === "early"
