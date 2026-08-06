@@ -97,3 +97,18 @@ test("stock and browser refreshes are bounded and deduplicated", async () => {
   assert.ok(pageSource.includes("signal: AbortSignal.timeout(18_000)"));
   assert.ok(pageSource.includes("signal: AbortSignal.timeout(14_000)"));
 });
+
+test("dynamic sector leaders receive an auditable three-sample precursor lane", async () => {
+  const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const signalSource = await readFile(new URL("../app/api/signals/route.ts", import.meta.url), "utf8");
+
+  assert.ok(pageSource.includes("const liveLeaderCodes = effectiveSectors"));
+  assert.ok(pageSource.includes("stock.change >= 8.5"));
+  assert.ok(pageSource.includes("stock.turnover < 2.5"));
+  assert.ok(pageSource.includes("stock.flow <= 0"));
+  assert.ok(pageSource.includes("hits: previous.hits + 1"));
+  assert.ok(pageSource.includes('signalType: "precursor" as const'));
+  assert.ok(pageSource.includes("连续三次20秒刷新成立"));
+  assert.ok(signalSource.includes('row.signal_type === "precursor"'));
+  assert.ok(signalSource.includes("Number(payload.confirmationHits) >= 3"));
+});
