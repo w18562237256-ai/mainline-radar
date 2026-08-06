@@ -17,7 +17,7 @@ type SignalInput = {
   eventKey: string;
   tradeDate: string;
   triggeredAt: string;
-  signalType: "early" | "add" | "recovery" | "core" | "chase";
+  signalType: "early" | "add" | "recovery" | "core" | "chase" | "precursor";
   stockCode: string;
   stockName: string;
   sectorName: string;
@@ -45,6 +45,27 @@ function isAuditableSignal(row: Record<string, unknown>) {
       };
       return payload.sector?.limitUpsExact === true
         && Number(payload.sector.limitUps) >= 2;
+    } catch {
+      return false;
+    }
+  }
+  if (row.signal_type === "precursor") {
+    try {
+      const payload = JSON.parse(String(row.payload || "{}")) as {
+        stock?: { code?: string; change?: number; turnover?: number; flow?: number };
+        sector?: { leaderCode?: string; score?: number; flow?: number; breadth?: number };
+        confirmationHits?: number;
+      };
+      return payload.stock?.code === row.stock_code
+        && payload.sector?.leaderCode === row.stock_code
+        && Number(payload.confirmationHits) >= 3
+        && Number(payload.stock?.change) >= 3
+        && Number(payload.stock?.change) < 8.5
+        && Number(payload.stock?.turnover) >= 2.5
+        && Number(payload.stock?.flow) > 0
+        && Number(payload.sector?.score) >= 68
+        && Number(payload.sector?.flow) > 0
+        && Number(payload.sector?.breadth) >= 58;
     } catch {
       return false;
     }
@@ -92,7 +113,7 @@ export async function POST(request: Request) {
     if (
       !/^\d{4}-\d{2}-\d{2}$/.test(input.tradeDate)
       || !/^\d{6}$/.test(input.stockCode)
-      || !["early", "add", "recovery", "core", "chase"].includes(input.signalType)
+      || !["early", "add", "recovery", "core", "chase", "precursor"].includes(input.signalType)
       || !input.eventKey?.startsWith(`${input.tradeDate}:`)
       || !input.stockName?.trim()
       || !input.sectorName?.trim()
