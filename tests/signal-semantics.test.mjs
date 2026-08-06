@@ -18,3 +18,9 @@ test("normalizes historical early events as sector observations", () => {
   assert.match(signalRouteSource, /event\.signal_type === "early"/);
   assert.match(signalRouteSource, /不构成个股买点/);
 });
+
+test("labels precursor leaders as observations rather than buy points", () => {
+  assert.match(pageSource, /龙头先手观察/);
+  assert.match(pageSource, /这是提前留痕，不是买入提示/);
+  assert.match(pageSource, /连续三次20秒刷新成立/);
+});
